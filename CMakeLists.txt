@@ -22,28 +22,10 @@ set(EXECUTABLE_NAME "floorheating")
 set(LIBRARY_NAME    "floorheatlib")
 
 ### CMAKE MODULES
-
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
-# include(ConfigSafeGuards)
 include(Warnings)
-# include(Docs)
-# include(AddGitSubmodule)
-# include(FetchContent)
 
 
-# include(Ccache)
-
-# if (ENABLE_TESTING)
-#     include(CTest)
-#     endif()
-# if (ENABLE_COVERAGE)
-#     include(CodeCoverage)
-#     append_coverage_compiler_flags()
-# endif()
-
-if (ENABLE_LTO)
-    find_lto(CXX)
-endif()
 
 ### EXTERNAL LIBRARIES
 
@@ -55,7 +37,8 @@ endif()
 
 ### Cross building 
 if(BUILDING_RASPI_ZERO)
-    include(crossarmv6l)
+    message("Using CMake Module: ${PATH_CMAKE_MODUL}")
+    message("Cross Build for Target Architektur: ${CMAKE_SYSTEM_PROCESSOR}")
 endif(BUILDING_RASPI_ZERO)
 
 ### SUB DIRECTORIES
@@ -65,12 +48,24 @@ add_subdirectory(app)
 
 ### INSTALL TARGETS
 
-# install(TARGETS ${EXECUTABLE_NAME}
-#         EXPORT ${LIBRARY_NAME}
-#         ARCHIVE DESTINATION lib
-#         LIBRARY DESTINATION lib
-#         RUNTIME DESTINATION bin)
 
-# install(TARGETS ${LIBRARY_NAME}
-#         ARCHIVE DESTINATION lib
-#         LIBRARY DESTINATION lib)
+
+install(TARGETS ${EXECUTABLE_NAME}
+        EXPORT ${LIBRARY_NAME}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib
+        RUNTIME DESTINATION bin)
+
+install(TARGETS ${LIBRARY_NAME}
+        ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION lib)
+
+if(${BUILDING_RASPI_ZERO})
+  install(CODE "
+  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/utils/copybin.sh ${PATH_INSTALLDIR} ${IPTARGET} ${USER} ${PASSWORD}
+  RESULT_VARIABLE result)
+  if(NOT result EQUAL 0)
+    message(FATAL_ERROR \"Install failed! \${result}\")
+  endif()
+  ")
+endif()

@@ -1,8 +1,9 @@
 #include "mini.hpp"
 
-
-int main()
-{
-
-    return 0;
+#include <iostream>
+int main() {
+  mini m{};
+  m.print();
+  std::cout << "Hello cross build!\n";
+  return 0;
 }
