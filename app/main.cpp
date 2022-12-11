@@ -1,9 +1,11 @@
-#include "mini.hpp"
+// #include <smartfloorheading/mini.hpp>
+
+#include "../include/smartfloorheading/mini.hpp"
 
 #include <iostream>
+
 int main() {
-  mini m{};
-  m.print();
   std::cout << "Hello cross build!\n";
+
   return 0;
 }

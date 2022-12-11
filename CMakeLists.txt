@@ -51,14 +51,16 @@ add_subdirectory(app)
 
 
 install(TARGETS ${EXECUTABLE_NAME}
-        EXPORT ${LIBRARY_NAME}
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
+        # ${LIBRARY_NAME}
+        # LIBRARY DESTINATION lib
         RUNTIME DESTINATION bin)
 
 install(TARGETS ${LIBRARY_NAME}
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib)
+        LIBRARY DESTINATION lib
+        COMPONENT Libraries
+        COMPONENT Development 
+        PUBLIC_HEADER DESTINATION include/smartfloorheading
+        COMPONENT Development)
 
 if(${BUILDING_RASPI_ZERO})
   install(CODE "
