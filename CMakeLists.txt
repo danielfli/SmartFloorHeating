@@ -13,9 +13,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS   ON)
 option(USE_CONAN            "Whether to use conan"         OFF)
 option(ENABLE_WARNINGS      "Enable to add warnings to a target."   ON)
 option(ENABLE_TESTING       "Enable a Unit Testing build."          OFF)
-option(ENABLE_COVERAGE      "Enable a Code Coverage build."         OFF)
-option(ENABLE_CLANG_TIDY    "Enable to add clang tidy."             OFF)
-option(ENABLE_CCACHE        "Enable to add Ccache."                 OFF)
 
 # Project/Library Names
 set(EXECUTABLE_NAME "floorheating")

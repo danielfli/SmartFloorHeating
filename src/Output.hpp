@@ -5,7 +5,8 @@ namespace sfh
 class Output
 {
   private:
-    /* data */
+  
+
   public:
     Output(/* args */);
     ~Output();

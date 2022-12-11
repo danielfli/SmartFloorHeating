@@ -1,4 +1,4 @@
-# Building smart Floorheating control
+# Smart Floorheating control
 
 # Using Rasp Zero W
 

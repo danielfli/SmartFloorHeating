@@ -1,6 +1,8 @@
 ﻿#include "Output.hpp"
 #include <iostream>
 
+#include <bcm2835.h>
+
 namespace sfh
 {
 Output::Output(/* args */)
