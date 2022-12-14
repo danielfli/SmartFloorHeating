@@ -10,7 +10,7 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
     ${LIBRARY_NAME}
     ${LIBRARY_HEADERS}
-    # ${CONAN_CXXOPTS}
+    libbcm2835.a
 )
 
 

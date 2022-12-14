@@ -1,17 +1,32 @@
 ﻿#pragma once
+#include <vector>
 
 namespace sfh
 {
+
 class Output
 {
   private:
-  
+    bool InitSuccess;
+    std::vector<unsigned int> output;
 
   public:
-    Output(/* args */);
+    Output(const unsigned int num);
     ~Output();
 
-    void SwitchOn();
+    operator bool()
+    {
+        return InitSuccess;
+    }
+
+    void SwitchAllOn();
+
+    void SwitchAllOff();
+
+    void TurnOn(const int unsigned id);
+    void TurnOff(const int unsigned id);
+
+    std::vector<unsigned int> GetSwitches();
 };
 
 } // namespace sfh

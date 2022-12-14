@@ -1,20 +1,108 @@
 ﻿#include "Output.hpp"
+#include <array>
 #include <iostream>
+#include <string>
+#include <string_view>
 
 #include <bcm2835.h>
 
 namespace sfh
 {
-Output::Output(/* args */)
+constexpr int MAX_GPIO = 10;
+constexpr std::array<unsigned int, 12> Pin = {
+    17,
+    18,
+    21,
+    22,
+    23,
+    24,
+    10,
+    9,
+    25,
+    11,
+    8,
+    7,
+};
+//ToDo: Rename the name
+constexpr std::array<std::string_view, 12> PinName{"RPI_GPIO_P1_11",
+                                                   "RPI_GPIO_P1_12",
+                                                   "RPI_GPIO_P1_13",
+                                                   "RPI_GPIO_P1_15",
+                                                   "RPI_GPIO_P1_16",
+                                                   "RPI_GPIO_P1_18",
+                                                   "RPI_GPIO_P1_19",
+                                                   "RPI_GPIO_P1_21",
+                                                   "RPI_GPIO_P1_22",
+                                                   "RPI_GPIO_P1_23",
+                                                   "RPI_GPIO_P1_24",
+                                                   "RPI_GPIO_P1_26"};
+
+Output::Output(const unsigned int num) : InitSuccess(false)
 {
+    // InitSuccess = bcm2835_init();
+    unsigned int count = 0;
+
+    if (num > MAX_GPIO)
+    {
+        count = MAX_GPIO;
+    }
+    else
+    {
+        count = num;
+    }
+
+    for (unsigned int i = 0; i < count; i++)
+    {
+        std::cout << i << " distributor Pin: " << Pin[i] << "GPIO " << PinName[i] << "\n";
+
+        output.push_back(Pin[i]);
+
+        bcm2835_gpio_fsel(static_cast<uint8_t>(Pin[i]), BCM2835_GPIO_FSEL_OUTP);
+    }
 }
 
 Output::~Output()
 {
+    bcm2835_close();
 }
 
-void Output::SwitchOn()
+void Output::SwitchAllOn()
 {
-    std::cout << "switch on\n";
+    for (auto &&i : output)
+    {
+        std::cout << i << " pin on\n";
+        // Turn it on
+        bcm2835_gpio_write(static_cast<uint8_t>(i), HIGH);
+    }
 }
+
+void Output::SwitchAllOff()
+{
+    for (auto &&i : output)
+    {
+        std::cout << i << " pin off\n";
+        //Turn it on
+        bcm2835_gpio_write(static_cast<uint8_t>(i), LOW);
+    }
+}
+
+std::vector<unsigned int> Output::GetSwitches()
+{
+    return output;
+}
+
+void Output::TurnOn(const unsigned int id)
+{
+    std::cout << id << " pin on\n";
+
+    bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
+}
+
+void TurnOff(const int unsigned id)
+{
+    std::cout << id << " pin off\n";
+
+    bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
+}
+
 } // namespace sfh

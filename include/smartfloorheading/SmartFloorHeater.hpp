@@ -15,7 +15,9 @@ class SmartFloorHeater
     std::map<std::string,const unsigned int> _tempsensor;
 
   public:
-    SmartFloorHeater(HeatingStructure heating);
+    SmartFloorHeater();
     ~SmartFloorHeater();
+
+    void DoSome();
 };
 } // namespace sfh
