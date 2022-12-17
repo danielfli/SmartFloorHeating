@@ -98,7 +98,7 @@ void Output::TurnOn(const unsigned int id)
     bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
 }
 
-void TurnOff(const int unsigned id)
+void Output::TurnOff(const int unsigned id)
 {
     std::cout << id << " pin off\n";
 
