@@ -4,25 +4,24 @@
 #include <string>
 #include <string_view>
 
-
 #include <bcm2835.h>
 
 namespace sfh
 {
 constexpr int MAX_GPIO = 10;
 constexpr std::array<uint8_t, 12> Pin = {
-    17,
-    18,
-    21,
-    22,
-    23,
-    24,
-    10,
-    9,
-    25,
-    11,
-    8,
-    7,
+    17, // 11
+    18, // 12
+    21, // 13
+    22, // 15
+    23, // 16
+    24, // 18
+    10, // 19
+    9,  // 21
+    25, // 22
+    11, // 23
+    8,  // 24
+    7,  // 26
 };
 //ToDo: Rename the name
 constexpr std::array<std::string_view, 12> PinName{"RPI_GPIO_P1_11",
@@ -60,7 +59,7 @@ Output::Output(const unsigned int num) : InitSuccess(false)
 
     for (unsigned int i = 0; i < count; i++)
     {
-        std::cout << i << " distributor Pin: " << Pin[i] << "GPIO " << PinName[i] << "\n";
+        std::cout << i << " distributor Pin: " << Pin[i] << " GPIO " << PinName[i] << "\n";
 
         output.push_back(Pin[i]);
 
@@ -74,13 +73,21 @@ Output::~Output()
     bcm2835_close();
 }
 
+/**
+ * @brief Elegoo 8 Kanal DC 5V Relaismodul
+ * https://amzn.eu/d/4pwvRF8
+ * On with pull down to ground
+ * off with pull up on 3.3 V
+ * @param id Pin numnber
+ */
+
 void Output::SwitchAllOn()
 {
     for (auto &&i : output)
     {
         std::cout << i << " pin on\n";
         // Turn it on
-        bcm2835_gpio_write(static_cast<uint8_t>(i), HIGH);
+        bcm2835_gpio_write(static_cast<uint8_t>(i), LOW);
     }
 }
 
@@ -90,7 +97,7 @@ void Output::SwitchAllOff()
     {
         std::cout << i << " pin off\n";
         //Turn it on
-        bcm2835_gpio_write(static_cast<uint8_t>(i), LOW);
+        bcm2835_gpio_write(static_cast<uint8_t>(i), HIGH);
     }
 }
 
@@ -103,14 +110,15 @@ void Output::TurnOn(const unsigned int id)
 {
     std::cout << id << " pin on\n";
 
-    bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
+    //
+    bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
 }
 
 void Output::TurnOff(const int unsigned id)
 {
     std::cout << id << " pin off\n";
 
-    bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
+    bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
 }
 
 } // namespace sfh

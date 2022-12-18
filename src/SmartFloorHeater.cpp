@@ -1,7 +1,7 @@
 ﻿#include "../include/smartfloorheading/SmartFloorHeater.hpp"
 #include "Output.hpp"
-#include <thread>
 #include <iostream>
+#include <thread>
 // #include <chrono>
 namespace sfh
 {
@@ -17,14 +17,38 @@ SmartFloorHeater::~SmartFloorHeater()
 void SmartFloorHeater::DoSome()
 {
     Output out{5};
-
+    auto switches = out.GetSwitches();
+    // out.SwitchAllOn();
+    int cout = 10;
+    unsigned int numSwitch = 0;
+    while (cout > 0)
+    {
+        cout--;
+        out.TurnOn(switches[0]);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        out.TurnOff(switches[0]);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
     out.SwitchAllOn();
+    std::this_thread::sleep_for(std::chrono::seconds(10));
+    out.SwitchAllOff();
+
+    std::cout << "small checkout menu\n";
+    std::cout << "Enter a number 0 - 10 to switch on for 2 sec (break with 99)- ";
     while (true)
     {
-        out.TurnOn(out.GetSwitches()[2]);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-        out.TurnOff(out.GetSwitches()[2]);
-    
+        std::cout << "number: ";
+        std::cin >> numSwitch;
+        if (numSwitch == 99)
+        {
+            break;
+        }
+        else
+        {
+            out.TurnOn(switches[numSwitch]);
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            out.TurnOff(switches[numSwitch]);
+        }
     }
 }
 
