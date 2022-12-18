@@ -16,7 +16,8 @@ SmartFloorHeater::~SmartFloorHeater()
 
 void SmartFloorHeater::DoSome()
 {
-    Output out{5};
+    unsigned int distr = 5;
+    Output out{distr};
     auto switches = out.GetSwitches();
     // out.SwitchAllOn();
     int cout = 10;
@@ -34,7 +35,7 @@ void SmartFloorHeater::DoSome()
     out.SwitchAllOff();
 
     std::cout << "small checkout menu\n";
-    std::cout << "Enter a number 0 - 10 to switch on for 2 sec (break with 99)- ";
+    std::cout << "Enter a number 0 - X to switch on for 2 sec (break with 99)- ";
     while (true)
     {
         std::cout << "number: ";
@@ -43,7 +44,7 @@ void SmartFloorHeater::DoSome()
         {
             break;
         }
-        else
+        else if (numSwitch < distr)
         {
             out.TurnOn(switches[numSwitch]);
             std::this_thread::sleep_for(std::chrono::seconds(2));

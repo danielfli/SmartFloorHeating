@@ -76,8 +76,6 @@ Output::~Output()
 /**
  * @brief Elegoo 8 Kanal DC 5V Relaismodul
  * https://amzn.eu/d/4pwvRF8
- * On with pull down to ground
- * off with pull up on 3.3 V
  * @param id Pin numnber
  */
 
@@ -87,7 +85,7 @@ void Output::SwitchAllOn()
     {
         std::cout << i << " pin on\n";
         // Turn it on
-        bcm2835_gpio_write(static_cast<uint8_t>(i), LOW);
+        bcm2835_gpio_write(static_cast<uint8_t>(i), HIGH);
     }
 }
 
@@ -97,7 +95,7 @@ void Output::SwitchAllOff()
     {
         std::cout << i << " pin off\n";
         //Turn it on
-        bcm2835_gpio_write(static_cast<uint8_t>(i), HIGH);
+        bcm2835_gpio_write(static_cast<uint8_t>(i), LOW);
     }
 }
 
@@ -111,14 +109,14 @@ void Output::TurnOn(const unsigned int id)
     std::cout << id << " pin on\n";
 
     //
-    bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
+    bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
 }
 
 void Output::TurnOff(const int unsigned id)
 {
     std::cout << id << " pin off\n";
 
-    bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
+    bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
 }
 
 } // namespace sfh
