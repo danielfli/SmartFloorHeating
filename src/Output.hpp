@@ -26,7 +26,7 @@ class Output
     void TurnOn(const int unsigned id);
     void TurnOff(const int unsigned id);
 
-    std::vector<unsigned int> GetSwitches();
+    std::vector<unsigned int> GetSwitches() const;
 };
 
 } // namespace sfh
