@@ -24,6 +24,6 @@ int main() {
 
   std::cout << "json: "  << name.dump();
 
-   mysfh.DoSome();
+  mysfh.DoSome();
   return 0;
 }

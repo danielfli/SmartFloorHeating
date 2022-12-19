@@ -24,6 +24,6 @@ CPU min MHz:         700.0000
 BogoMIPS:            697.95
 Flags:               half thumb fastmult vfp edsp java tls
 
+## Toolchain Cross building
 
-## Toolchain Cross building: 
 https://github.com/tttapa/docker-arm-cross-toolchain

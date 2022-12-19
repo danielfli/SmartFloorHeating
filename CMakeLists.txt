@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED     ON)
 set(CMAKE_CXX_EXTENSIONS            OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS   ON)
 
+#settings for building:
+set(RASPBERRY_VERSION 1) # 1: zero or 4: raspi 4  
+
 
 # Options
 option(USE_CONAN            "Whether to use conan"         OFF)

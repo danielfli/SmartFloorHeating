@@ -16,5 +16,5 @@ set_target_properties(${LIBRARY_NAME}
                         PROPERTIES PUBLIC_HEADER ${LIBRARY_HEADERS})
 
 if (${ENABLE_WARNINGS})
-    target_set_warnings(TARGET ${LIBRARY_NAME} ENABLE ON AS_ERROR ON)
+    target_set_warnings(TARGET ${LIBRARY_NAME} ENABLE ON AS_ERROR OFF)
 endif()
