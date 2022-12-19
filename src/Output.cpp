@@ -1,7 +1,7 @@
 ﻿#include "Output.hpp"
 #include <iostream>
 
-#include <bcm2835.h>
+// #include <bcm2835.h>
 
 namespace sfh
 {

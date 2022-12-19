@@ -3,7 +3,7 @@
 namespace sfh
 {
 
-SmartFloorHeater::SmartFloorHeater(HeatingStructure heating)
+SmartFloorHeater::SmartFloorHeater()
 {
     
 }

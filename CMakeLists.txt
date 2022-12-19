@@ -23,14 +23,19 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/)
 include(Warnings)
 
 
-
 ### EXTERNAL LIBRARIES
+# include(AddGitSubmodule)
+include(FetchContent)
+## json lib 
+# add_git_submodule(external/json)
 
-if(USE_CONAN)
-    message("Using Conan")
-    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-    conan_basic_setup()
-endif()
+
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json
+    GIT_TAG  v3.10.1 
+    GIT_SHALLOW TRUE)
+FetchContent_MakeAvailable(json)
 
 ### Cross building 
 if(BUILDING_RASPI_ZERO)
@@ -39,7 +44,7 @@ if(BUILDING_RASPI_ZERO)
 endif(BUILDING_RASPI_ZERO)
 
 ### SUB DIRECTORIES
-
+add_subdirectory(external)
 add_subdirectory(src)
 add_subdirectory(app)
 
