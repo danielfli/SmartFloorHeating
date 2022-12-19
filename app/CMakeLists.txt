@@ -5,12 +5,14 @@ add_executable(${EXECUTABLE_NAME} ${APP_SOURCES})
 target_include_directories(${LIBRARY_NAME} PUBLIC
     ${CMAKE_BINARY_DIR}
     ${CMAKE_PROJECT_DIR}/include/smartfloorheading
+    ${CMAKE_PROJECT_DIR}/external
 )
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
     ${LIBRARY_NAME}
     ${LIBRARY_HEADERS}
-    libbcm2835.a
+    bcm2835.a
+    nlohmann_json
 )
 
 
