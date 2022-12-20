@@ -1,29 +1,44 @@
 
-#include "../include/smartfloorheading/SmartFloorHeater.hpp"
+#include "../include/smartfloorheating/SmartFloorHeater.hpp"
 
-#include <fstream>
-#include <filesystem>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <exception>
 #include <iostream>
+#include <set>
+#include <string>
+namespace pt = boost::property_tree;
 
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
+auto path = "/usr/local/etc/smartfloorheating/connectiontempapi.json";
+// int main()
+// {
+//     std::cout << "Hello cross build!\n";
+//     // sfh::SmartFloorHeater mysfh;
 
-int main() {
-  std::cout << "Hello cross build!\n";
-  sfh::SmartFloorHeater mysfh;
+//     // mysfh.DoSome();
+//     return 0;
+// }
 
-  auto ifs = std::ifstream{ "test.json" };
-    if (!ifs.is_open())
+int main()
+{
+    try
     {
-      std::cout << "error\n";
-        return 1;
+        pt::ptree apisetting;
+        pt::read_json(path, apisetting);
+
+        auto strid = apisetting.get<std::string>("id", "??");
+
+        std::cout << "Some JSON Paser: " << strid << "\n";
+        // for (auto &&i : apisetting)
+        // {
+        //     std::cout << "some: " << i.first << " more: " << i.second.data();
+        // }
+
+        std::cout << "Success\n";
     }
-    
-  const auto parsed_data = json::parse(ifs);
-  const auto name = parsed_data["name"];
-
-  std::cout << "json: "  << name.dump();
-
-  mysfh.DoSome();
-  return 0;
+    catch (std::exception &e)
+    {
+        std::cout << "Error: " << e.what() << "\n";
+    }
+    return 0;
 }

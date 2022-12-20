@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.18.4)
 
-project("smartfloorheading" VERSION 1.0.0 LANGUAGES C CXX)
+project("smartfloorheating" VERSION 1.0.0 LANGUAGES C CXX)
 
 # Global CMake variables are set here
 set(CMAKE_CXX_STANDARD              20)
@@ -28,20 +28,28 @@ include(Warnings)
 
 
 ### EXTERNAL LIBRARIES
-include(FetchContent)
+# include(FetchContent)
+# FetchContent_Declare( in
+#     json
+#     GIT_REPOSITORY https://github.com/nlohmann/json
+#     GIT_TAG  v3.11.2
+#     GIT_SHALLOW TRUE)
+# FetchContent_MakeAvailable(json)
+# find_package(json)
+# install setp ist a problem
 
-FetchContent_Declare(
-    json
-    GIT_REPOSITORY https://github.com/nlohmann/json
-    GIT_TAG  v3.10.1 
-    GIT_SHALLOW TRUE)
-FetchContent_MakeAvailable(json)
+set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
+set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
+set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
 
 
 ### SUB DIRECTORIES
 add_subdirectory(external)
 add_subdirectory(src)
 add_subdirectory(app)
+add_subdirectory(etc)
 
 include(GNUInstallDirs)
 
@@ -55,8 +63,16 @@ install(TARGETS ${LIBRARY_NAME}
         LIBRARY DESTINATION lib
         COMPONENT Libraries
         COMPONENT Development 
-        PUBLIC_HEADER DESTINATION include/smartfloorheading
+        PUBLIC_HEADER DESTINATION include/smartfloorheating
         COMPONENT Development)
+
+# install(FILES etc/smartfloorheating/*
+#         DESTINATION etc/smartfloorheating
+#         COMPONENT 
+#         )
+
+install(DIRECTORY etc/ DESTINATION etc
+        FILES_MATCHING PATTERN "*.json")
 
 ### Deploy data to Target
 if(NOT "${RASPBERRY_VERSION}" STREQUAL "")

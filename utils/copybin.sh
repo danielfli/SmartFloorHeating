@@ -13,7 +13,8 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-rsync -vr --rsh="sshpass -p $pass ssh -o StrictHostKeyChecking=no -l $user" include/* $ip:/usr/local/include
-rsync -vr --rsh="sshpass -p $pass ssh -o StrictHostKeyChecking=no -l $user" bin/* $ip:/usr/local/bin
-rsync -vr --rsh="sshpass -p $pass ssh -o StrictHostKeyChecking=no -l $user" lib/* $ip:/usr/local/lib
+rsync -arv --update --rsh="sshpass -p $pass ssh -o StrictHostKeyChecking=no -l $user" include/* $ip:/usr/local/include
+rsync -arv --update  --rsh="sshpass -p $pass ssh -o StrictHostKeyChecking=no -l $user" bin/* $ip:/usr/local/bin
+rsync -arv --update  --rsh="sshpass -p $pass ssh -o StrictHostKeyChecking=no -l $user" lib/* $ip:/usr/local/lib
+rsync -arv --update  --rsh="sshpass -p $pass ssh -o StrictHostKeyChecking=no -l $user" etc/* $ip:/usr/local/etc
 echo "install success on $ip!"

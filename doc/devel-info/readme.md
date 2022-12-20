@@ -1,6 +1,6 @@
 ﻿# Devel Infomation & Links
 
-## Raspberry Pi CPU 
+## Raspberry Pi CPU
 
 ### Datesheet
 
@@ -9,7 +9,6 @@
 ### Library for bcm2835
 
 [https://www.airspayce.com/mikem/bcm2835/index.html](Link)
-
 
 ## Setup Cross Building Env Linux
 
