@@ -77,7 +77,7 @@ install(DIRECTORY etc/ DESTINATION etc
 ### Deploy data to Target
 if(NOT "${RASPBERRY_VERSION}" STREQUAL "")
   install(CODE "
-  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/utils/copybin.sh ${PATH_INSTALLDIR} ${IPTARGET} ${USER} ${PASSWORD}
+  execute_process(COMMAND ${CMAKE_SOURCE_DIR}/utils/copybin.sh ${PATH_INSTALLDIR} ${IPTARGET} ${USER}
   RESULT_VARIABLE result)
   if(NOT result EQUAL 0)
     message(FATAL_ERROR \"Install failed! \${result}\")

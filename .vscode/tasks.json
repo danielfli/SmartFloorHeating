@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "cmake",
+      "label": "CMake: install",
+      "command": "install",
+      "preset": "${command:cmake.activeBuildPresetName}",
+      "problemMatcher": [],
+      "detail": "CMake template install task",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "Copy executable to target",
+      "command": "scp ${command:cmake.launchTargetPath} root@192.168.2.145:~",
+      "problemMatcher": []
+    }
+  ]
+}
