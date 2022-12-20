@@ -8,6 +8,9 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
     ${CMAKE_PROJECT_DIR}/external
 )
 
+find_library(bcm2835 /usr/local/lib/)
+# find_package(Boost REQUIRED COMPONENTS program_options)
+
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
     ${LIBRARY_NAME}
     ${LIBRARY_HEADERS}

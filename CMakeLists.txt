@@ -8,9 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED     ON)
 set(CMAKE_CXX_EXTENSIONS            OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS   ON)
 
-#settings for building:
-set(RASPBERRY_VERSION 1) # 1: zero or 4: raspi 4  
-
+# Cross building 
+if(NOT "${RASPBERRY_VERSION}" STREQUAL "")
+  message( STATUS "Cross Build for Target Architektur: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
 
 # Options
 option(USE_CONAN            "Whether to use conan"         OFF)
@@ -27,11 +28,7 @@ include(Warnings)
 
 
 ### EXTERNAL LIBRARIES
-# include(AddGitSubmodule)
 include(FetchContent)
-## json lib 
-# add_git_submodule(external/json)
-
 
 FetchContent_Declare(
     json
@@ -40,21 +37,15 @@ FetchContent_Declare(
     GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(json)
 
-### Cross building 
-if(BUILDING_RASPI_ZERO)
-    message("Using CMake Module: ${PATH_CMAKE_MODUL}")
-    message("Cross Build for Target Architektur: ${CMAKE_SYSTEM_PROCESSOR}")
-endif(BUILDING_RASPI_ZERO)
 
 ### SUB DIRECTORIES
 add_subdirectory(external)
 add_subdirectory(src)
 add_subdirectory(app)
 
+include(GNUInstallDirs)
+
 ### INSTALL TARGETS
-
-
-
 install(TARGETS ${EXECUTABLE_NAME}
         # ${LIBRARY_NAME}
         # LIBRARY DESTINATION lib
@@ -67,7 +58,8 @@ install(TARGETS ${LIBRARY_NAME}
         PUBLIC_HEADER DESTINATION include/smartfloorheading
         COMPONENT Development)
 
-if(${BUILDING_RASPI_ZERO})
+### Deploy data to Target
+if(NOT "${RASPBERRY_VERSION}" STREQUAL "")
   install(CODE "
   execute_process(COMMAND ${CMAKE_SOURCE_DIR}/utils/copybin.sh ${PATH_INSTALLDIR} ${IPTARGET} ${USER} ${PASSWORD}
   RESULT_VARIABLE result)

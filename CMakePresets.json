@@ -38,18 +38,35 @@
       }
     },
     {
-      "name": "cross",
-      "displayName": "linux-cross-arm",
+      "name": "cross-zero",
+      "displayName": "linux-cross-zero",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/build/${presetName}/install",
+      "toolchainFile": "${sourceDir}/cmake/crossarmv6l.cmake",
       "cacheVariables": {
-        "BUILDING_RASPI_ZERO": true,
-        "PATH_CMAKE_MODUL": "crossarmv6l.cmake",
-        "CMAKE_TOOLCHAIN_FILE": {
-          "type": "FILEPATH",
-          "value": "${sourceDir}/cmake/crossarmv6l.cmake"
-        },
+        "RASPBERRY_VERSION": "1",
+        "PATH_INSTALLDIR": "${sourceDir}/out/build/${presetName}/install",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "IPTARGET": "192.168.2.145",
+        "USER": "root",
+        "PASSWORD": "123"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "cross-raspi4",
+      "displayName": "linux-cross-raspi4",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/build/${presetName}/install",
+      "toolchainFile": "${sourceDir}/cmake/crossraspi64.cmake",
+      "cacheVariables": {
+        "RASPBERRY_VERSION": "4",
         "PATH_INSTALLDIR": "${sourceDir}/out/build/${presetName}/install",
         "CMAKE_BUILD_TYPE": "Debug",
         "IPTARGET": "192.168.2.145",
