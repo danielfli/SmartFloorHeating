@@ -119,3 +119,14 @@ Installing Lib von apt Repo like so:
 sudo sbuild-apt rpizero-buster-armhf apt-get install libboost-all-dev
 ```
 
+### Cross Debugging 
+
+[https://tttapa.github.io/Pages/Raspberry-Pi/C++-Development-RPiOS/Debugging.html](Link)
+
+Set up the .vscode/ files 
+
+Install on devel pc: 
+
+```bash
+apt install gdb-multiarch
+```

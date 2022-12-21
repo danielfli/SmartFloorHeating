@@ -14,13 +14,15 @@ endif()
 
 find_file(bcm2835 bcm2835.h PATHS /usr/local/include/ NO_DEFAULT_PATH)
 if(NOT bcm2835)
-    message(FATAL_ERROR "Can't find gssapi_krb5.h in ${bcm2835ApiIncludes}")
+    message(FATAL_ERROR "Can't find bcm2835.h in ${bcm2835ApiIncludes}")
 endif()
+
 
 target_include_directories(${LIBRARY_NAME} PUBLIC
     ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}/include/smartfloorheating
     ${bcm2835ApiIncludes}
+    ${CURL_INCLUDE_DIR}
     )
 
 set_target_properties(${LIBRARY_NAME} 

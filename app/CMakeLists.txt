@@ -24,9 +24,10 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
 )
 
 target_link_libraries(${EXECUTABLE_NAME} PUBLIC
-    # ${LIBRARY_NAME}
+    ${LIBRARY_NAME}
     ${LIBRARY_HEADERS}
     ${Boost_LIBRARIES}
+    ${CURL_LIBRARIES}
     bcm2835.a
 )
 

@@ -44,6 +44,12 @@ set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
 set(Boost_USE_MULTITHREADED      ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 
+### curl
+find_package(CURL REQUIRED) 
+if(CURL_FOUND)
+  message(STATUS "Curl lib found")
+endif(CURL_FOUND)
+
 
 ### SUB DIRECTORIES
 add_subdirectory(external)
