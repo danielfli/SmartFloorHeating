@@ -1,44 +1,30 @@
 
 #include "../include/smartfloorheating/SmartFloorHeater.hpp"
 
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <exception>
 #include <iostream>
-#include <set>
 #include <string>
-namespace pt = boost::property_tree;
 
-auto path = "/usr/local/etc/smartfloorheating/connectiontempapi.json";
-// int main()
-// {
-//     std::cout << "Hello cross build!\n";
-//     // sfh::SmartFloorHeater mysfh;
-
-//     // mysfh.DoSome();
-//     return 0;
-// }
+using namespace std;
 
 int main()
 {
+    std::cout << "SMART FLOOR HEATING starting!\n";
+    sfh::SmartFloorHeater mysfh;
+
     try
     {
-        pt::ptree apisetting;
-        pt::read_json(path, apisetting);
-
-        auto strid = apisetting.get<std::string>("id", "??");
-
-        std::cout << "Some JSON Paser: " << strid << "\n";
-        // for (auto &&i : apisetting)
-        // {
-        //     std::cout << "some: " << i.first << " more: " << i.second.data();
-        // }
-
-        std::cout << "Success\n";
+        mysfh.DoSomeInput();
     }
-    catch (std::exception &e)
+    catch (const std::exception &e)
     {
-        std::cout << "Error: " << e.what() << "\n";
+        std::cerr << e.what() << '\n';
     }
+    catch (...)
+    {
+        std::cerr << "Error was catched - Errors! " << '\n';
+        return 1;
+    }
+
     return 0;
 }

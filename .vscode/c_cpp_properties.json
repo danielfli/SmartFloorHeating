@@ -4,9 +4,9 @@
       "name": "linux-gcc-x64",
       "includePath": [
         "${workspaceFolder}/**",
-        "/var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/include",
-        "/var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/local/include",
-        "/var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/include/arm-linux-gnueabihf/"
+        "/var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/include/**",
+        "/var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/local/include/**",
+        "/var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/include/arm-linux-gnueabihf/**"
       ],
       "compilerPath": "/usr/bin/gcc",
       "cStandard": "${default}",

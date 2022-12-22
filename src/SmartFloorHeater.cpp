@@ -1,5 +1,6 @@
 ﻿#include "../include/smartfloorheating/SmartFloorHeater.hpp"
 #include "Output.hpp"
+#include "Input.hpp"
 #include <iostream>
 #include <thread>
 // #include <chrono>
@@ -14,7 +15,16 @@ SmartFloorHeater::~SmartFloorHeater()
 {
 }
 
-void SmartFloorHeater::DoSome()
+void SmartFloorHeater::DoSomeInput()
+{
+    Input ip;
+    ip.DoConfiguration();
+    // ip.DebugApi();
+    ip.GetAccessToken(true, false);
+    // ip.DebugResponse();
+}
+
+void SmartFloorHeater::DoSomeOutput()
 {
     unsigned int distr = 5;
     Output out{distr};

@@ -18,6 +18,12 @@
       "label": "Copy executable to target",
       "command": "scp ${command:cmake.launchTargetPath} root@192.168.2.145:~",
       "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "label": "Copy and execute on target",
+      "command": "scp ${command:cmake.launchTargetPath} root@192.168.2.145:~ && ssh root@192.168.2.145  ./${command:cmake.launchTargetFilename} ",
+      "problemMatcher": []
     }
   ]
 }

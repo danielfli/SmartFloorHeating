@@ -49,8 +49,7 @@
         "PATH_INSTALLDIR": "${sourceDir}/out/build/${presetName}/install",
         "CMAKE_BUILD_TYPE": "Debug",
         "IPTARGET": "192.168.2.145",
-        "USER": "root",
-        "PASSWORD": "123"
+        "USER": "root"
       },
       "condition": {
         "type": "equals",

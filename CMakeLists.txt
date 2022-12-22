@@ -50,6 +50,17 @@ if(CURL_FOUND)
   message(STATUS "Curl lib found")
 endif(CURL_FOUND)
 
+### etl
+find_package(etl 20.35.7 REQUIRED)
+if(ETL_FOUND)
+  message(STATUS "etl lib found")
+endif(ETL_FOUND)
+
+###
+find_package(OpenSSL REQUIRED)
+if(OPENSSL_FOUND)
+  message(STATUS "openssl lib found")
+endif()
 
 ### SUB DIRECTORIES
 add_subdirectory(external)

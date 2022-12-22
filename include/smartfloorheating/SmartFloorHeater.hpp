@@ -2,8 +2,8 @@
 
 #include "Construction.hpp"
 
-#include <string>
 #include <map>
+#include <string>
 
 namespace sfh
 {
@@ -18,6 +18,7 @@ class SmartFloorHeater
     SmartFloorHeater();
     ~SmartFloorHeater();
 
-    void DoSome();
+    void DoSomeInput();
+    void DoSomeOutput();
 };
 } // namespace sfh

@@ -27,3 +27,43 @@ Flags:               half thumb fastmult vfp edsp java tls
 ## Toolchain Cross building
 
 https://github.com/tttapa/docker-arm-cross-toolchain
+
+## External lib needed
+
+- Boost property tree []()
+- etl []()
+
+### Install Lib 
+
+boost lib
+
+```bash
+apt install libboost-all-dev
+```
+
+ETL lib (header only)
+
+```bash
+git clone https://github.com/ETLCPP/etl.git
+cd etl
+git checkout <targetVersion>
+cmake -B build .
+cmake --install build/
+```
+
+### Cross Build
+
+install the lib to the chroot:
+
+- /usr/local/include/etl/ /var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/local/include/
+- /usr/local/share/etl/ /var/lib/schroot/chroots/rpizero-bullseye-armhf/usr/local/share/
+
+to the target:
+
+- /usr/local/share/etl/ /usr/local/share/
+- /usr/local/include/etl/ /usr/local/include/
+
+```bash
+scp -r /usr/local/include/etl/ $user@$ip:/usr/local/include/
+scp -r e/usr/local/share/etl/ $user@$ip:/usr/local/share/
+```
