@@ -1,24 +1,26 @@
 #include "Input.hpp"
-#include <vector>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <exception>
-#include <iostream>
-#include <set>
-#include <sstream>
-#include <string>
 
 #include <chrono>
 #include <curl/curl.h>
+#include <exception>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
+
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+#include <set>
+#include <sstream>
+#include <string>
+#include <vector>
 
 auto constexpr path = "/usr/local/etc/smartfloorheating/connectiontempapi.json";
+auto constexpr pathDeviceInfo = "/usr/local/etc/smartfloorheating/tuyaDeviceInfos.json";
 
 namespace sfh
 {
@@ -80,11 +82,23 @@ std::string ConvertUpperCase(std::string lowercase)
 
 boost::property_tree::ptree GetResponse(std::string JsonInput)
 {
-    // Output: {"result":{"access_token":"159827a6c1b5132657da993ca6a1ff5c","expire_time":4534,"refresh_token":"84cdde9be095b30186f8643e1182605d","uid":"bay1670956745243Nc6H"},"success":true,"t":1671740530441,"tid":"503ab894823611ed86f7ea3d2b411a8b"}
+    const std::string _path = "/tmp/_repsonseapituya.json";
     std::cout << "RAW - Output: " << JsonInput << std::endl;
+    std::ofstream _respose;
+    _respose.open(_path);
+    _respose << JsonInput;
+    _respose.close();
+
     pt::ptree root;
-    pt::write_json(JsonInput, root);
-    std::cout << "Test-Output: " << root.get<std::string>("success","xxx") << "\n";
+    try
+    {
+        pt::read_json(_path, root);
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << "\n";
+    }
+
     return root;
 }
 
@@ -147,17 +161,7 @@ TokenResult GetTokenData(boost::property_tree::ptree response, bool verbose)
     return result;
 }
 
-} // namespace UTILS
-
-Input::Input(/* args */)
-{
-}
-
-Input::~Input()
-{
-}
-
-bool Input::DoConfiguration()
+void APISetup(TuyaAPIEnv &apiEnv)
 {
     try
     {
@@ -166,15 +170,15 @@ bool Input::DoConfiguration()
 
         auto data = apisetting.get_child("TuyaApiValues");
 
-        _apiEnv.client_id = data.get<std::string>("client_id", "xxx");
-        _apiEnv.secret = data.get<std::string>("secret", "xxx");
-        _apiEnv.device_id = data.get<std::string>("device_id", "xxx");
+        apiEnv.client_id = data.get<std::string>("client_id", "xxx");
+        apiEnv.secret = data.get<std::string>("secret", "xxx");
+        apiEnv.device_id = data.get<std::string>("device_id", "xxx");
 
-        std::cout << "client_id: " << _apiEnv.client_id << " \n";
-        std::cout << "secret: " << _apiEnv.secret << " \n";
-        std::cout << "device_id: " << _apiEnv.device_id << " \n";
+        std::cout << "client_id: " << apiEnv.client_id << " \n";
+        std::cout << "secret: " << apiEnv.secret << " \n";
+        std::cout << "device_id: " << apiEnv.device_id << " \n";
 
-        if (_apiEnv.client_id == "xxx" && _apiEnv.secret == "xxx" && _apiEnv.device_id == "xxx")
+        if (apiEnv.client_id == "xxx" && apiEnv.secret == "xxx" && apiEnv.device_id == "xxx")
         {
             std::cerr << "Error: Could not read: " << path << "\n";
         }
@@ -183,8 +187,59 @@ bool Input::DoConfiguration()
     {
         std::cerr << "Error: " << e.what() << "\n";
     }
-    return 0;
-    return false;
+}
+
+void APIDeviceSetup(std::vector<DeviceInfo> &deviceInfo)
+{
+    try
+    {
+        DeviceInfo devices{};
+        pt::ptree apisetting;
+        pt::read_json(pathDeviceInfo, apisetting);
+
+        auto data = apisetting.get_child("tempdevices");
+        for (auto &&i : data)
+        {
+            devices.name = i.first;
+            devices.id = i.second.data();
+            deviceInfo.push_back(devices);
+        }
+    }
+    catch (std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << "\n";
+    }
+}
+
+} // namespace UTILS
+
+Input::Input(/* args */) : _vecdeviceInfo()
+{
+}
+
+Input::~Input()
+{
+}
+
+bool Input::DoConfiguration(bool verbose)
+{
+    UTILS::APISetup(_apiEnv);
+
+    if (_apiEnv.easy_access_token == "")
+        return false;
+
+    UTILS::APIDeviceSetup(_vecdeviceInfo);
+
+    if (verbose)
+        for (auto &&i : _vecdeviceInfo)
+        {
+            std::cout << "Test: " << i.name << " " << i.id << "\n";
+        }
+
+    if (_vecdeviceInfo[0].id != "" && _vecdeviceInfo[0].name != "")
+        return false;
+
+    return true;
 }
 
 void Input::DebugHash()
@@ -199,14 +254,13 @@ void Input::DebugHash()
 
 void Input::DebugResponse()
 {
-        try
+    try
     {
         pt::ptree api_response;
         pt::read_json("/usr/local/etc/smartfloorheating/responseTokenError.json", api_response);
 
         UTILS::GetTokenData(api_response, true);
         // auto data = apisetting.get_child("TuyaApiValues");
-
     }
     catch (std::exception &e)
     {
@@ -279,7 +333,6 @@ bool Input::GetAccessToken(bool verbose, bool dryrun)
         if (verbose)
             std::cout << "RAW - Output: " << readBuffer << std::endl;
 
-        //ToDo: String nach ptree fehler!! sting obj in json to ptree ??? 
         UTILS::GetTokenData(UTILS::GetResponse(readBuffer), verbose);
         curl_easy_cleanup(curl); /* always cleanup */
     }
@@ -289,7 +342,7 @@ bool Input::GetAccessToken(bool verbose, bool dryrun)
     return result;
 }
 
-bool Input::GetDeviceInfos()
+bool Input::GetDeviceInfos(bool verbose)
 {
     // CURL *curl;
     // CURLcode res;
@@ -312,6 +365,28 @@ bool Input::GetDeviceInfos()
     //     res = curl_easy_perform(curl);
     // }
     // curl_easy_cleanup(curl);
+    CURL *curl;
+    CURLcode res;
+    curl = curl_easy_init();
+    if (curl)
+    {
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_easy_setopt(curl, CURLOPT_URL, "https://openapi.tuyaeu.com/v1.0/devices/bf994fd645e428869fe6y8");
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, "https");
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, "client_id: du773dh8ejkds3uu4n3q");
+        headers = curl_slist_append(headers, "access_token: 3fddcae0ad24f4a1510caa092e2c3264");
+        headers = curl_slist_append(headers, "sign: A1271F858942203B182462D695A15AC9E4C62B1FADE57BD2334FC6F93DEE4B0E");
+        headers = curl_slist_append(headers, "t: 1672145878579");
+        headers = curl_slist_append(headers, "sign_method: HMAC-SHA256");
+        headers = curl_slist_append(headers, "nonce: ");
+        headers = curl_slist_append(headers, "stringToSign: ");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        res = curl_easy_perform(curl);
+    }
+    curl_easy_cleanup(curl);
+
     return false;
 }
 

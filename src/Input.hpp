@@ -29,11 +29,19 @@ struct TokenResult
     std::string tid;
 };
 
+struct DeviceInfo
+{
+  std::string name;
+  std::string id;
+};
+
+
 class Input
 {
   private:
     TuyaAPIEnv _apiEnv;
     TokenResult _responseToken;
+    std::vector<DeviceInfo> _vecdeviceInfo;
 
   public:
     Input();
@@ -43,10 +51,12 @@ class Input
     
     void DebugResponse();
 
-    bool DoConfiguration();
+    bool DoConfiguration(bool verbose);
 
     bool GetAccessToken(bool verbose, bool dryrun = false);
-    bool GetDeviceInfos();
+    bool GetDeviceInfos(bool verbose);
+
+    double GetTemp(DeviceInfo deviceinfo);
 };
 
 } // namespace sfh

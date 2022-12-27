@@ -1,6 +1,7 @@
 ﻿#include "../include/smartfloorheating/SmartFloorHeater.hpp"
-#include "Output.hpp"
 #include "Input.hpp"
+#include "Output.hpp"
+#include "TwoLevelController.hpp"
 #include <iostream>
 #include <thread>
 // #include <chrono>
@@ -18,10 +19,27 @@ SmartFloorHeater::~SmartFloorHeater()
 void SmartFloorHeater::DoSomeInput()
 {
     Input ip;
-    ip.DoConfiguration();
-    // ip.DebugApi();
-    ip.GetAccessToken(true, false);
-    // ip.DebugResponse();
+    ip.DoConfiguration(true);
+    // ip.GetAccessToken(true, false);
+}
+
+void SmartFloorHeater::DoSomeControl()
+{
+    TwoLevelController controller(2);
+
+    double input = 0;
+    double actual = 0;
+
+    while (1)
+    {
+        std::cout << "\nSetPoint : ";
+        std::cin >> input;
+        std::cout << "\nacual Temp: ";
+        std::cin >> actual;
+
+        controller.SetsetPoint_W(input, actual);
+        // std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
 }
 
 void SmartFloorHeater::DoSomeOutput()

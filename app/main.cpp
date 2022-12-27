@@ -15,6 +15,7 @@ int main()
     try
     {
         mysfh.DoSomeInput();
+        // mysfh.DoSomeControl();
     }
     catch (const std::exception &e)
     {
