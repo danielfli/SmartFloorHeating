@@ -8,7 +8,7 @@ class Output
 {
   private:
     bool InitSuccess;
-    std::vector<unsigned int> output;
+    std::vector<unsigned int> _output;
 
   public:
     Output(const unsigned int num);

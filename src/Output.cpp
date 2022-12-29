@@ -4,8 +4,6 @@
 #include <string>
 #include <string_view>
 
-// #include <bcm2835.h>
-
 #include <bcm2835.h>
 
 namespace sfh
@@ -14,7 +12,7 @@ constexpr int MAX_GPIO = 10;
 constexpr std::array<uint8_t, 12> Pin = {
     17, // 11
     18, // 12
-    21, // 13
+    27, // 13
     22, // 15
     23, // 16
     24, // 18
@@ -53,6 +51,7 @@ Output::Output(const unsigned int num) : InitSuccess(false)
     if (num > MAX_GPIO)
     {
         count = MAX_GPIO;
+        std::cout << "WARNING - using Max GPIO: " << MAX_GPIO << "\n";
     }
     else
     {
@@ -61,17 +60,19 @@ Output::Output(const unsigned int num) : InitSuccess(false)
 
     for (unsigned int i = 0; i < count; i++)
     {
-        std::cout << i << " distributor Pin: " << Pin[i] << " GPIO " << PinName[i] << "\n";
+        std::cout << "distributor " << i << " on Pin: " << Pin[i] << " with GPIO name: " << PinName[i] << "\n";
 
-        output.push_back(Pin[i]);
+        _output.push_back(Pin[i]);
 
-        // set pins to an output
+        // set pins to an _output
         bcm2835_gpio_fsel(static_cast<uint8_t>(Pin[i]), BCM2835_GPIO_FSEL_OUTP);
     }
 }
 
 Output::~Output()
 {
+    std::cout << "__SMART FLOOR HEATING__ ALL OFF\n";
+    SwitchAllOff();
     bcm2835_close();
 }
 
@@ -83,7 +84,7 @@ Output::~Output()
 
 void Output::SwitchAllOn()
 {
-    for (auto &&i : output)
+    for (auto &&i : _output)
     {
         std::cout << i << " pin on\n";
         // Turn it on
@@ -93,7 +94,7 @@ void Output::SwitchAllOn()
 
 void Output::SwitchAllOff()
 {
-    for (auto &&i : output)
+    for (auto &&i : _output)
     {
         std::cout << i << " pin off\n";
         //Turn it on
@@ -103,22 +104,33 @@ void Output::SwitchAllOff()
 
 std::vector<unsigned int> Output::GetSwitches() const
 {
-    return output;
+    return _output;
 }
 
 void Output::TurnOn(const unsigned int id)
 {
-    std::cout << id << " pin on\n";
-
-    //
-    bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
+    if (id == 0 || id < _output.size())
+    {
+        std::cout << "pin " << _output[id] << " - name: " << PinName[id] << " --> on\n";
+        bcm2835_gpio_write(static_cast<uint8_t>(_output[id]), HIGH);
+    }
+    else
+    {
+        std::cout << id << " unknown -> operation not permitted \n";
+    }
 }
 
 void Output::TurnOff(const int unsigned id)
 {
-    std::cout << id << " pin off\n";
-
-    bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
+    if (id == 0 || id < _output.size())
+    {
+        std::cout << "pin: " << _output[id] << " - name: " << PinName[id] << " --> off\n";
+        bcm2835_gpio_write(static_cast<uint8_t>(_output[id]), LOW);
+    }
+    else
+    {
+        std::cout << id << " unknown -> operation not permitted \n";
+    }
 }
 
 } // namespace sfh

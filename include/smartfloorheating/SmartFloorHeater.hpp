@@ -1,24 +1,23 @@
 ﻿#pragma once
-
-#include "Construction.hpp"
-
-#include <map>
-#include <string>
+#include "Option.hpp"
 
 namespace sfh
 {
 
+//sigleton pattern
 class SmartFloorHeater
 {
-  private:
-    // std::map<std::string,const unsigned int> _distributor;
-    // std::map<std::string,const unsigned int> _tempsensor;
-
   public:
-    SmartFloorHeater();
-    ~SmartFloorHeater();
+    SmartFloorHeater(SmartFloorHeater &other) = delete; // no cloneable
+    void operator=(const SmartFloorHeater &) = delete;  // no assignable
 
-    void DoSomeInput();
-    void DoSomeOutput();
+    static SmartFloorHeater &GetInstance();
+
+    void Execute(SFHOption &option);
+
+  private:
+    SmartFloorHeater();
+    static SmartFloorHeater *_instance;
+
 };
 } // namespace sfh
