@@ -1,21 +1,22 @@
-
+#include "../include/smartfloorheating/Option.hpp"
 #include "../include/smartfloorheating/SmartFloorHeater.hpp"
-
 #include <exception>
 #include <iostream>
 #include <string>
 
 using namespace std;
+using namespace sfh;
 
-int main()
+int main(int argc, char **argv)
 {
-    std::cout << "SMART FLOOR HEATING starting!\n";
-    sfh::SmartFloorHeater mysfh;
+    std::cout << "_____SMART FLOOR HEATING starting...\n";
+
+    SFHOption option;
+    option.Parse(argc, argv);
 
     try
     {
-        mysfh.DoSomeInput();
-        // mysfh.DoSomeControl();
+        SmartFloorHeater::GetInstance().Execute(option);
     }
     catch (const std::exception &e)
     {

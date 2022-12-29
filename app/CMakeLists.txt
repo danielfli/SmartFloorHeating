@@ -6,7 +6,7 @@ add_executable(${EXECUTABLE_NAME} ${APP_SOURCES})
 find_library(bcm2835 /usr/local/lib/)
 
 
-find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS program_options REQUIRED)
 if(Boost_FOUND)
     message(STATUS "Found Boost Library")
     # include_directories(${Boost_INCLUDE_DIRS})
