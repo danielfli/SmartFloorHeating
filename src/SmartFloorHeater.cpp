@@ -37,19 +37,11 @@ void SmartFloorHeater::Execute(SFHOption &option)
     }
 }
 
-// SmartFloorHeater::SmartFloorHeater()
-// {
-// }
-
-// SmartFloorHeater::~SmartFloorHeater()
-// {
-// }
-
 // void SmartFloorHeater::DoSomeInput()
 // {
 //     Input ip;
 //     ip.DoConfiguration(true);
-//     // ip.GetAccessToken(true, false);
+//     // ip.GetApiAccessToken(true, false);
 // }
 
 // void SmartFloorHeater::DoSomeControl()

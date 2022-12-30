@@ -1,4 +1,5 @@
 #pragma once
+#include "../include/smartfloorheating/HeatingConstruction.hpp"
 #include <string>
 #include <vector>
 
@@ -7,7 +8,6 @@ namespace sfh
 
 struct TuyaAPIEnv
 {
-    const std::string url = "https://openapi.tuyaeu.com";
     std::string client_id;
     std::string secret;
     std::string device_id;
@@ -25,38 +25,46 @@ struct TokenResult
     std::string refresh_token;
     std::string uid;
     bool success;
-    u_long time_response;
+    size_t time_response;
     std::string tid;
 };
 
-struct DeviceInfo
+struct DeviceID
 {
-  std::string name;
-  std::string id;
+    std::string name;
+    std::string id;
 };
 
+struct DeviceValue
+{
+    double temperature;
+    double humidity;
+    std::string battery_state;
+    std::string id;
+};
 
 class Input
 {
   private:
     TuyaAPIEnv _apiEnv;
     TokenResult _responseToken;
-    std::vector<DeviceInfo> _vecdeviceInfo;
+    std::vector<DeviceID> _vecdeviceInfo;
+    HeatingConstruction _heater;
 
   public:
-    Input();
-    ~Input();
-    
+    Input(HeatingConstruction heater);
+    ~Input() = default;
+
     void DebugHash();
-    
     void DebugResponse();
 
-    bool DoConfiguration(bool verbose);
+    bool DoConfiguration(bool verbose = false);
 
-    bool GetAccessToken(bool verbose, bool dryrun = false);
-    bool GetDeviceInfos(bool verbose);
+    bool GetApiAccessToken(bool verbose, bool dryrun = false);
+    DeviceValue GetApiDeviceInformation(std::string deviceId, bool verbose, bool dryrun = false);
 
-    double GetTemp(DeviceInfo deviceinfo);
+    std::vector<DeviceID> GetDevicesIDs();
+    double GetTemp(std::string id, bool verbose);
 };
 
 } // namespace sfh

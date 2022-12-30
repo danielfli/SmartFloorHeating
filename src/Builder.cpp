@@ -3,7 +3,11 @@
 #include <boost/bind/bind.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <chrono>
 #include <iostream>
+#include <thread>
+
+#include "Input.hpp"
 
 auto constexpr pathConf = "/usr/local/etc/smartfloorheating/floorheatingconfig.json";
 
@@ -65,11 +69,44 @@ void Builder::EasySwitchOn(const int switcher)
     }
 }
 
-void Builder::RunMaunal()
+//ToDo: Operation Input
+void Builder::RunOpteration()
 {
+    if (SetupHeater())
+    {
+        Input ip(_heater);
+        ip.DoConfiguration(_verbose);
+
+        auto devices = ip.GetDevicesIDs();
+        double temp = 0;
+        std::cout << "\n\n";
+        // temp = ip.GetTemp(devices[0].id, _verbose);
+        // std::cout << 1 << " Device: " << devices[0].name << " Temperatur: " << temp
+        //           << "\n";
+
+        // devices.size()
+
+        //     for (size_t i = 0; i < 1; i++)
+        //     {
+        //         temp = ip.GetTemp(devices[i].id, _verbose);
+        //         std::cout << i << " Device: " << devices[i].name << " Temperatur: " << temp << "\n";
+        //         std::this_thread::sleep_for(std::chrono::seconds(2));
+        //     }
+    }
+
+    else
+    {
+        EXIT_FAILURE;
+    }
+
+    // ip.GetApiAccessToken(true, false);
+    // ip.GetApiAccessToken(true, false);
+    // ip.GetApiDeviceInformation("bf994fd645e428869fe6y8", true, false);
+    // ip.GetApiDeviceInformation();
+    // ip.GetTemp()
 }
 
-void Builder::RunOpteration()
+void Builder::RunMaunal()
 {
 }
 
