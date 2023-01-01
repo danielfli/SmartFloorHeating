@@ -346,12 +346,11 @@ DeviceValue Input::GetApiDeviceInformation(std::string deviceId, bool verbose, b
     CURLcode res;
     std::string readBuffer;
     curl_global_init(CURL_GLOBAL_DEFAULT);
-
-    std::string str_URL = ("https://openapi.tuyaeu.com/v1.0/devices/" + deviceId);
-
     curl = curl_easy_init();
+
     if (curl)
     {
+        std::string str_URL = ("https://openapi.tuyaeu.com/v1.0/devices/" + deviceId);
         curl_easy_setopt(curl, CURLOPT_URL, str_URL.c_str());
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, "https");
@@ -360,7 +359,6 @@ DeviceValue Input::GetApiDeviceInformation(std::string deviceId, bool verbose, b
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
 
         struct curl_slist *headers = NULL;
-
         auto str_client = ("client_id: " + _apiEnv.client_id);
         auto str_access_token = ("access_token: " + _responseToken.access_token);
         auto tp = UTILS::GetCurrentTimestampStr();
@@ -374,6 +372,7 @@ DeviceValue Input::GetApiDeviceInformation(std::string deviceId, bool verbose, b
         {
             curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
             std::cout << "\n_____API CALL Get Device Information_____\n";
+            std::cout << "str_URL: " << str_URL << "\n";
             std::cout << "str_client: " << str_client << "\n";
             std::cout << "str_access_token: " << str_access_token << "\n";
             std::cout << "str_sign: " << str_sign << "\n";
@@ -406,11 +405,10 @@ DeviceValue Input::GetApiDeviceInformation(std::string deviceId, bool verbose, b
             std::cout << "RAW - Output: " << readBuffer << std::endl;
 
         result = UTILS::GetDeviceInformation(UTILS::GetResponse(readBuffer), verbose);
-
         curl_easy_cleanup(curl); /* always cleanup */
     }
-    curl_easy_cleanup(curl);
 
+    curl_global_cleanup();
     return result;
 }
 
@@ -450,7 +448,24 @@ std::vector<DeviceID> Input::GetDevicesIDs()
 
 double Input::GetTemp(std::string id, bool verbose)
 {
-    DeviceValue device_value{};
+
+    //ToDO: Get Token after expires
+    if (_responseToken.access_token == "")
+    {
+        std::cout << "\n\n______Get new Tuya Token______"
+                  << "\n";
+        if (!GetApiAccessToken(verbose))
+        {
+            std::cout << "\n\nERROR - get new token\n";
+            std::cout << "Working with old Data....\n";
+        }
+    }
+
+    std::cout << "\n\n_____Get Temp for " << id << "______\n";
+    DeviceValue device_value = GetApiDeviceInformation(id, verbose);
+
+    return device_value.temperature;
+
     // DeviceInfo olddeviceInfo = __deviceinfo;
     //ToDO: API Call check token time
     // Check old Timestamp or timestamp
@@ -462,24 +477,6 @@ double Input::GetTemp(std::string id, bool verbose)
     // std::cout << "oldtime   : " << oldtime << "\n";
     // std::cout << "timediff: " << timediff << "\n";
     // std::cout << "td2: " << td2 << "\n";
-
-    //ToDO: Get Token after expires
-    if (_responseToken.access_token == "")
-    {
-        std::cout << "\n\nGet new Token"
-                  << "\n";
-        if (!GetApiAccessToken(verbose))
-        {
-            std::cout << "\n\nERROR - get new token\n";
-            std::cout << "Working with old Data....\n";
-        }
-        else
-        {
-            device_value = GetApiDeviceInformation(id, verbose);
-        }
-    }
-
-    return device_value.temperature;
 }
 
 } // namespace sfh

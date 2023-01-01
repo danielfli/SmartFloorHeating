@@ -16,6 +16,7 @@ class Builder
 
     void EasySwitchOn(const int switcher);
     void RunOpteration();
+    void RunTest();
     void RunSimualtion();
     void RunMaunal();
 };

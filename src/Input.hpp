@@ -29,11 +29,6 @@ struct TokenResult
     std::string tid;
 };
 
-struct DeviceID
-{
-    std::string name;
-    std::string id;
-};
 
 struct DeviceValue
 {
