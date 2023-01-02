@@ -18,7 +18,7 @@ enum class States
     off
 };
 
-struct Thermostat
+struct Thermostat_Data
 {
     States state;
     std::string str_state;
@@ -31,24 +31,26 @@ struct Thermostat
 
 struct HAApi
 {
-  std::string token;
-  std::string ip;
-  std::string port;
+    std::string token;
+    std::string ip;
+    std::string port;
 };
 
-class InputHAClimate
+class Thermostate
 {
   private:
-    std::vector<DeviceID> _vecdeviceInfo;
+    std::vector<DeviceThermostat> _vecdeviceInfo;
+    std::vector<DeviceHeaterID> _vecdeviceoutput;
     HAApi _api;
 
   public:
-    InputHAClimate(HeatingConstruction heater, bool verbose);
-    ~InputHAClimate() = default;
+    Thermostate(HeatingConstruction heater, bool verbose);
+    ~Thermostate() = default;
 
-    std::vector<DeviceID> GetDevicesIDs();
+    std::vector<DeviceThermostat> GetInputDevices();
+    std::vector<DeviceHeaterID> GetOutputDevices();
 
-    Thermostat GetTherostatData(std::string deviceId, bool verbose, bool dryrun = false);
+    Thermostat_Data GetTherostatData(std::string deviceId, bool verbose, bool dryrun = false);
     bool SetHeaterState();
 };
 

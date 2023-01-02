@@ -1,14 +1,15 @@
 #include "Builder.hpp"
-#include "Simulation.hpp"
+#include "Input.hpp"
+#include "Operational.hpp"
+// #include "Simulation.hpp"
+#include "Thermostate.hpp"
 #include <boost/bind/bind.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <chrono>
 #include <iostream>
+#include <stdexcept>
 #include <thread>
-
-#include "Input.hpp"
-#include "InputHAClimate.hpp"
 
 auto constexpr pathConf = "/usr/local/etc/smartfloorheating/floorheatingconfig.json";
 
@@ -34,12 +35,14 @@ bool Builder::SetupHeater()
 
         _heater.distributor = config.get<unsigned int>("distributor", 0);
         _heater.temperatureSensor = config.get<unsigned int>("temperaturesensor", 0);
+        _heater.thermostat = config.get<unsigned int>("thermostat", 0);
 
         if (_verbose)
         {
             std::cout << "_____CONFIGURATION_____\n";
             std::cout << "Distributor: " << _heater.distributor << "\n";
             std::cout << "Temperature Sensor: " << _heater.temperatureSensor << "\n";
+            std::cout << "Thermostat: " << _heater.thermostat << "\n";
         }
 
         if (_heater.distributor == 0 && _heater.temperatureSensor == 0)
@@ -60,31 +63,9 @@ void Builder::EasySwitchOn(const int switcher)
 {
     if (SetupHeater())
     {
-        Simulation simu(_heater, switcher);
-        simu.SwitchOption();
+        // Simulation simu(_heater, switcher);
+        // simu.SwitchOption();
         // simu.run();
-    }
-    else
-    {
-        EXIT_FAILURE;
-    }
-}
-
-void Builder::RunTest()
-{
-    if (SetupHeater())
-    {
-        InputHAClimate inHaC(_heater, _verbose);
-        std::vector<DeviceID> devices = inHaC.GetDevicesIDs();
-
-        Thermostat thermostat{};
-
-        for (size_t i = 0; i < devices.size(); i++)
-        {
-            thermostat = inHaC.GetTherostatData(devices[i  ].id, _verbose);
-            std::cout << i << " Device: " << thermostat.friendly_name  << " Temperatur: " << thermostat.currentValueTemp << "\n";
-            // std::this_thread::sleep_for(std::chrono::seconds(1)); 
-        }
     }
     else
     {
@@ -94,24 +75,43 @@ void Builder::RunTest()
 
 void Builder::RunOpteration()
 {
-    if (SetupHeater())
+    if (!SetupHeater())
     {
-        Input ip(_heater);
-        ip.DoConfiguration(_verbose);
-
-        auto devices = ip.GetDevicesIDs();
-
-        double temp = 0;
-        for (size_t i = 0; i < devices.size(); i++)
-        {
-            // temp = ip.GetTemp(devices[i].id, _verbose);
-            std::cout << i << " Device: " << devices[i].name << " Temperatur: " << temp << "\n";
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+        throw std::runtime_error("ERROR: Wrong configuration");
     }
     else
     {
-        EXIT_FAILURE;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        /************************Input****************************************/
+        Thermostate thermostats(_heater, _verbose);
+        std::vector<DeviceThermostat> devices = thermostats.GetInputDevices();
+        Thermostat_Data thermostat{};
+
+        if (_verbose)
+        {
+            for (size_t i = 0; i < devices.size(); i++)
+            {
+                thermostat = thermostats.GetTherostatData(devices[i].id, _verbose);
+                std::cout << i << " Device: " << thermostat.friendly_name
+                          << " Temperatur: " << thermostat.currentValueTemp << "\n";
+                // std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
+
+        /************************Output****************************************/
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::vector<DeviceHeaterID> outputdevices = thermostats.GetOutputDevices();
+        Output output(outputdevices, _heater.distributor, _verbose);
+        if (!output)
+        {
+            throw std::runtime_error("ERROR: output error ");
+        }
+        // auto switches = output.GetSwitches();
+
+        /************************RUN*******************************************/
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        Operational op(_heater, thermostats, output);
+        op.Run();
     }
 }
 

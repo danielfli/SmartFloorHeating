@@ -219,7 +219,7 @@ void APISetup(TuyaAPIEnv &apiEnv, bool verbose)
 
         if (verbose)
         {
-            std::cout << "\n_____Read Tuya Inforamtion_____\n";
+            std::cout << "\n_____Read Tuya Information_____\n";
             std::cout << "client_id: " << apiEnv.client_id << " \n";
             std::cout << "secret: " << apiEnv.secret << " \n";
             std::cout << "device_id: " << apiEnv.device_id << " \n";
@@ -236,11 +236,11 @@ void APISetup(TuyaAPIEnv &apiEnv, bool verbose)
     }
 }
 
-void APIDeviceSetup(std::vector<DeviceID> &deviceInfo)
+void APIDeviceSetup(std::vector<DeviceThermostat> &deviceInfo)
 {
     try
     {
-        DeviceID devices{};
+        DeviceThermostat devices{};
         pt::ptree apisetting;
         pt::read_json(pathDeviceInfo, apisetting);
 
@@ -417,7 +417,7 @@ bool Input::DoConfiguration(bool verbose)
     UTILS::APISetup(_apiEnv, verbose);
     UTILS::APIDeviceSetup(_vecdeviceInfo);
 
-    std::cout << "\n_____Read Device Inforamtion_____\n";
+    std::cout << "\n_____Read Device Information_____\n";
     unsigned int countTempDevice = 0;
     for (auto &&i : _vecdeviceInfo)
     {
@@ -441,7 +441,7 @@ bool Input::DoConfiguration(bool verbose)
     return true;
 }
 
-std::vector<DeviceID> Input::GetDevicesIDs()
+std::vector<DeviceThermostat> Input::GetDevicesIDs()
 {
     return _vecdeviceInfo;
 }

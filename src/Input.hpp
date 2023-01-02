@@ -29,7 +29,6 @@ struct TokenResult
     std::string tid;
 };
 
-
 struct DeviceValue
 {
     double temperature;
@@ -43,7 +42,7 @@ class Input
   private:
     TuyaAPIEnv _apiEnv;
     TokenResult _responseToken;
-    std::vector<DeviceID> _vecdeviceInfo;
+    std::vector<DeviceThermostat> _vecdeviceInfo;
     HeatingConstruction _heater;
 
   public:
@@ -58,7 +57,7 @@ class Input
     bool GetApiAccessToken(bool verbose, bool dryrun = false);
     DeviceValue GetApiDeviceInformation(std::string deviceId, bool verbose, bool dryrun = false);
 
-    std::vector<DeviceID> GetDevicesIDs();
+    std::vector<DeviceThermostat> GetDevicesIDs();
     double GetTemp(std::string id, bool verbose);
 };
 

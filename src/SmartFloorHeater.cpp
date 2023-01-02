@@ -25,8 +25,7 @@ void SmartFloorHeater::Execute(SFHOption &option)
         switch (option.runstate)
         {
         case 0:
-            // app.RunOpteration();
-            app.RunTest();
+            app.RunOpteration();
             break;
         case 10:
             app.RunSimualtion();

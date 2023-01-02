@@ -1,10 +1,11 @@
 ﻿#include "Output.hpp"
 #include <array>
+#include <bcm2835.h>
+#include <chrono>
 #include <iostream>
 #include <string>
 #include <string_view>
-
-#include <bcm2835.h>
+#include <thread>
 
 namespace sfh
 {
@@ -37,7 +38,7 @@ constexpr std::array<std::string_view, 12> PinName{"RPI_GPIO_P1_11",
                                                    "RPI_GPIO_P1_24",
                                                    "RPI_GPIO_P1_26"};
 
-Output::Output(const unsigned int num) : InitSuccess(false)
+Output::Output(std::vector<DeviceHeaterID> &vecdeviceoutput, const size_t num, bool verbose) : InitSuccess(false)
 {
     InitSuccess = bcm2835_init();
     if (!InitSuccess)
@@ -46,7 +47,7 @@ Output::Output(const unsigned int num) : InitSuccess(false)
         EXIT_FAILURE;
     }
 
-    unsigned int count = 0;
+    size_t count = 0;
 
     if (num > MAX_GPIO)
     {
@@ -58,14 +59,29 @@ Output::Output(const unsigned int num) : InitSuccess(false)
         count = num;
     }
 
-    for (unsigned int i = 0; i < count; i++)
+    std::cout << "\n\n_____Set Output_____\n";
+    // DeviceHeaterID device{};
+    _output = vecdeviceoutput;
+
+    for (size_t i = 0; i < count; i++)
     {
-        std::cout << "distributor " << i << " on Pin: " << Pin[i] << " with GPIO name: " << PinName[i] << "\n";
+        if (verbose)
+        {
+            std::cout << "distributor " << i << " on Pin: " << Pin[i] << " with GPIO name: " << PinName[i] << "\n";
+        }
 
-        _output.push_back(Pin[i]);
-
+        _output[i].id = Pin[i];
         // set pins to an _output
         bcm2835_gpio_fsel(static_cast<uint8_t>(Pin[i]), BCM2835_GPIO_FSEL_OUTP);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    if (num != count)
+    {
+        //ToDO: one temp sensor for more than one distributor
+        std::cout << "\n_____WARNING! Device Information are not the same_____\n";
+        std::cout << "floorheatingconfig.json - distributor: " << num << "\n";
+        std::cout << "WARNING: more configuration are needed!\n";
     }
 }
 
@@ -84,35 +100,43 @@ Output::~Output()
 
 void Output::SwitchAllOn()
 {
-    for (auto &&i : _output)
+
+    for (size_t i = 0; i < _output.size(); i++)
     {
         std::cout << i << " pin on\n";
         // Turn it on
-        bcm2835_gpio_write(static_cast<uint8_t>(i), HIGH);
+        bcm2835_gpio_write(static_cast<uint8_t>(_output[i].id), HIGH);
     }
 }
 
 void Output::SwitchAllOff()
 {
-    for (auto &&i : _output)
+    for (size_t i = 0; i < _output.size(); i++)
     {
         std::cout << i << " pin off\n";
-        //Turn it on
-        bcm2835_gpio_write(static_cast<uint8_t>(i), LOW);
+        // Turn it off
+        bcm2835_gpio_write(static_cast<uint8_t>(_output[i].id), LOW);
     }
 }
 
-std::vector<unsigned int> Output::GetSwitches() const
+std::vector<DeviceHeaterID> Output::GetSwitches() const
 {
     return _output;
 }
 
-void Output::TurnOn(const unsigned int id)
+void Output::TurnOn(const size_t id)
 {
     if (id == 0 || id < _output.size())
     {
-        std::cout << "pin " << _output[id] << " - name: " << PinName[id] << " --> on\n";
-        bcm2835_gpio_write(static_cast<uint8_t>(_output[id]), HIGH);
+        for (size_t i = 0; i < _output.size(); i++)
+        {
+            if (_output[i].id == id)
+            {
+                std::cout << "pin " << id << " - name: " << PinName[id] << " --> on\n";
+
+                bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
+            }
+        }
     }
     else
     {
@@ -124,8 +148,15 @@ void Output::TurnOff(const int unsigned id)
 {
     if (id == 0 || id < _output.size())
     {
-        std::cout << "pin: " << _output[id] << " - name: " << PinName[id] << " --> off\n";
-        bcm2835_gpio_write(static_cast<uint8_t>(_output[id]), LOW);
+        for (size_t i = 0; i < _output.size(); i++)
+        {
+            if (_output[i].id == id)
+            {
+                std::cout << "pin " << id << " - name: " << PinName[id] << " --> off\n";
+
+                bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
+            }
+        }
     }
     else
     {

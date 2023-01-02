@@ -1,4 +1,4 @@
-#include "InputHAClimate.hpp"
+#include "Thermostate.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/bind/bind.hpp>
@@ -45,9 +45,9 @@ boost::property_tree::ptree GetResponse(std::string JsonInput)
     return root;
 }
 
-Thermostat ConvertDataToThermostat(boost::property_tree::ptree response, bool verbose)
+Thermostat_Data ConvertDataToThermostat(boost::property_tree::ptree response, bool verbose)
 {
-    Thermostat result{};
+    Thermostat_Data result{};
     result.currentValueTemp = response.get<double>("attributes.current_temperature", 99.9);
     result.friendly_name = response.get<std::string>("attributes.friendly_name", "xxx");
     result.max_temp = response.get<double>("attributes.max_temp", 99.9);
@@ -71,32 +71,42 @@ Thermostat ConvertDataToThermostat(boost::property_tree::ptree response, bool ve
         std::cout << "result.max_temp: " << result.max_temp << std::endl;
         std::cout << "result.min_temp: " << result.min_temp << std::endl;
         std::cout << "result.setValueTemp: " << result.setValueTemp << std::endl;
-        // std::cout << "result.time_response: " << result.time_response << std::endl;
         std::cout << "result.str_state: " << result.str_state << std::endl;
     }
 
     return result;
 }
 
-void Setup(std::vector<DeviceID> &vecdeviceInfo, HAApi &api, bool verbose)
+void Setup(std::vector<DeviceThermostat> &vecdeviceInfo,
+           std::vector<DeviceHeaterID> &vecdeviceoutput,
+           HAApi &api,
+           bool verbose)
 {
     std::string _path = "/usr/local/etc/smartfloorheating/connectionhomeassistant.json";
     try
     {
-        DeviceID deviceid{};
+        DeviceThermostat deviceinputid{};
+        DeviceHeaterID deviceoutputid{};
         pt::ptree setting;
         pt::read_json(_path, setting);
 
         for (auto &&i : setting.get_child("thermostat.entity_id"))
         {
-            deviceid.name = i.first;
-            deviceid.id = i.second.data();
-            vecdeviceInfo.push_back(deviceid);
+            deviceinputid.name = i.first;
+            deviceinputid.id = i.second.data();
+            vecdeviceInfo.push_back(deviceinputid);
         }
 
         api.token = setting.get<std::string>("api.token", "");
         api.ip = setting.get<std::string>("api.ip", "");
         api.port = setting.get<std::string>("api.port", "");
+
+        for (auto &&i : setting.get_child("heater.entity_id"))
+        {
+            deviceoutputid.name = i.first;
+            deviceoutputid.entity_id = i.second.data();
+            vecdeviceoutput.push_back(deviceoutputid);
+        }
 
         if (verbose)
         {
@@ -110,10 +120,9 @@ void Setup(std::vector<DeviceID> &vecdeviceInfo, HAApi &api, bool verbose)
             std::cout << "token: " << api.token << std::endl;
         }
 
-        if (vecdeviceInfo.empty() || api.token.empty() || api.ip.empty() || api.port.empty())
+        if (vecdeviceInfo.empty() || api.token.empty() || api.ip.empty() || api.port.empty() || vecdeviceoutput.empty())
         {
-            std::cerr << "Error: Could not read: " << _path << "\n";
-            throw "Missing input.";
+            throw std::runtime_error("ERROR: Read Home Assistant Information - missing input." + _path);
         }
     }
     catch (std::exception &e)
@@ -124,11 +133,11 @@ void Setup(std::vector<DeviceID> &vecdeviceInfo, HAApi &api, bool verbose)
 
 } // namespace utils
 
-InputHAClimate::InputHAClimate(HeatingConstruction heater, bool verbose)
+Thermostate::Thermostate(HeatingConstruction heater, bool verbose)
 {
-    utils::Setup(_vecdeviceInfo, _api, verbose);
+    utils::Setup(_vecdeviceInfo, _vecdeviceoutput, _api, verbose);
 
-    std::cout << "\n_____Read Device Inforamtion_____\n";
+    std::cout << "\n_____Read Device Information_____\n";
     unsigned int countTempDevice = 0;
 
     for (auto &&i : _vecdeviceInfo)
@@ -140,20 +149,30 @@ InputHAClimate::InputHAClimate(HeatingConstruction heater, bool verbose)
         countTempDevice++;
     }
 
+    for (auto &&i : _vecdeviceoutput)
+    {
+        if (verbose)
+        {
+            std::cout << i.name << " " << i.entity_id << "\n";
+        }
+    }
+
     if (_vecdeviceInfo[0].id == "" && _vecdeviceInfo[0].name == "")
         std::cout << "______ERROR: Cloud not read deviceInfos.\n";
 
-    if (heater.temperatureSensor != countTempDevice)
+    if (heater.thermostat != countTempDevice)
     {
+        //ToDO: one temp sensor for more than one distributor
         std::cout << "\n_____WARNING! Device Information are not the same_____\n";
         std::cout << "floorheatingconfig.json - Temperaturesensor: " << heater.temperatureSensor << "\n";
-        std::cout << "thermostat number: " << countTempDevice << "\n\n\n";
+        std::cout << "thermostat number: " << countTempDevice << "\n";
+        std::cout << "WARNING: more configuration are needed!\n";
     }
 }
 
-Thermostat InputHAClimate::GetTherostatData(std::string deviceId, bool verbose, bool dryrun)
+Thermostat_Data Thermostate::GetTherostatData(std::string deviceId, bool verbose, bool dryrun)
 {
-    Thermostat thermostat{};
+    Thermostat_Data thermostat{};
     CURL *curl;
     CURLcode res;
     std::string readBuffer;
@@ -211,12 +230,17 @@ Thermostat InputHAClimate::GetTherostatData(std::string deviceId, bool verbose, 
     return thermostat;
 }
 
-std::vector<DeviceID> InputHAClimate::GetDevicesIDs()
+std::vector<DeviceThermostat> Thermostate::GetInputDevices()
 {
     return _vecdeviceInfo;
 }
 
-bool InputHAClimate::SetHeaterState()
+std::vector<DeviceHeaterID> Thermostate::GetOutputDevices()
+{
+    return _vecdeviceoutput;
+}
+
+bool Thermostate::SetHeaterState()
 {
     return false;
 }
