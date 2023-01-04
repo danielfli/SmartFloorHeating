@@ -29,6 +29,17 @@ struct Thermostat_Data
     std::string friendly_name;
 };
 
+struct Heater_Data
+{
+    bool state;
+    std::string entity_id;
+
+    void SetStateTrue()
+    {
+      state = true;
+    }
+};
+
 struct HAApi
 {
     std::string token;
@@ -36,7 +47,7 @@ struct HAApi
     std::string port;
 };
 
-class Thermostate
+class Thermostat
 {
   private:
     std::vector<DeviceThermostat> _vecdeviceInfo;
@@ -44,14 +55,15 @@ class Thermostate
     HAApi _api;
 
   public:
-    Thermostate(HeatingConstruction heater, bool verbose);
-    ~Thermostate() = default;
+    Thermostat(HeatingConstruction heater, bool verbose);
+    ~Thermostat() = default;
 
     std::vector<DeviceThermostat> GetInputDevices();
     std::vector<DeviceHeaterID> GetOutputDevices();
 
     Thermostat_Data GetTherostatData(std::string deviceId, bool verbose, bool dryrun = false);
-    bool SetHeaterState();
+    Heater_Data GetStateData(std::string heaterId, bool verbose, bool dryrun = false);
+    Heater_Data SetHeaterState(Heater_Data heater, bool verbose, bool dryrun = false);
 };
 
 } // namespace sfh

@@ -24,6 +24,9 @@ constexpr std::array<uint8_t, 12> Pin = {
     8,  // 24
     7,  // 26
 };
+
+int Output::instance = 0;
+
 //ToDo: Rename the name
 constexpr std::array<std::string_view, 12> PinName{"RPI_GPIO_P1_11",
                                                    "RPI_GPIO_P1_12",
@@ -46,7 +49,7 @@ Output::Output(std::vector<DeviceHeaterID> &vecdeviceoutput, const size_t num, b
         std::cout << "Failed to Init Output...\n";
         EXIT_FAILURE;
     }
-
+    instance++;
     size_t count = 0;
 
     if (num > MAX_GPIO)
@@ -87,9 +90,14 @@ Output::Output(std::vector<DeviceHeaterID> &vecdeviceoutput, const size_t num, b
 
 Output::~Output()
 {
-    std::cout << "__SMART FLOOR HEATING__ ALL OFF\n";
-    SwitchAllOff();
-    bcm2835_close();
+    std::cout << "__SMART FLOOR HEATING__ ALL OFF " << instance << " \n ";
+    
+    if (instance == 0)
+    {
+        SwitchAllOff();
+        bcm2835_close();
+    }
+    instance--;
 }
 
 /**

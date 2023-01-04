@@ -2,7 +2,7 @@
 #include "Input.hpp"
 #include "Operational.hpp"
 // #include "Simulation.hpp"
-#include "Thermostate.hpp"
+#include "Thermostat.hpp"
 #include <boost/bind/bind.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -83,10 +83,11 @@ void Builder::RunOpteration()
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         /************************Input****************************************/
-        Thermostate thermostats(_heater, _verbose);
+        /************************Thermostat***********************************/
+        Thermostat thermostats(_heater, _verbose);
         std::vector<DeviceThermostat> devices = thermostats.GetInputDevices();
         Thermostat_Data thermostat{};
-
+        Heater_Data heater_state{};
         if (_verbose)
         {
             for (size_t i = 0; i < devices.size(); i++)
@@ -106,6 +107,20 @@ void Builder::RunOpteration()
         {
             throw std::runtime_error("ERROR: output error ");
         }
+
+        /************************Output***************************************/
+        /************************State****************************************/
+        if (_verbose)
+        {
+            for (size_t i = 0; i < outputdevices.size(); i++)
+            {
+                heater_state = thermostats.GetStateData(outputdevices[i].entity_id, _verbose);
+                std::cout << i << " heater id: " << heater_state.entity_id
+                          << " heater state: " << heater_state.state << "\n";
+                // std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
+
         // auto switches = output.GetSwitches();
 
         /************************RUN*******************************************/

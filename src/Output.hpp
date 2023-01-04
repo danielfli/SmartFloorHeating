@@ -11,6 +11,7 @@ class Output
   private:
     bool InitSuccess;
     std::vector<DeviceHeaterID> _output;
+    static int instance; //ToDo: sigelton create
 
   public:
     Output(std::vector<DeviceHeaterID>& vecdeviceoutput, const size_t num, bool verbose = false);
