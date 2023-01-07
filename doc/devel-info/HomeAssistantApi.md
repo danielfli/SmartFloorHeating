@@ -17,7 +17,7 @@ api:
 Check with curl
 
 ```bash
-curl -X GET -H "Authorization: Bearer xyz"   http://192.168.2.165:8123/api/
+curl -X GET -H "Authorization: Bearer xyz"   http://192.168.2.xxx:8123/api/
 ```
 
 If this answer is the folling, that good 
@@ -36,7 +36,7 @@ Update some entity State hear the bad per POST
 
 ```bash
 curl -X POST -H "Authorization: Bearer xyz -H "Content-Type: application/json" -d '{"entity_id":"input_boolean.heater_bad","state":"on","attributes":{"editable":false,"icon":"mdi:radiator","friendly_name":"Bad Heizung an"}}' http://192.168.2.165:8123/api/states/input_boolean.heater_bad
-{"entity_id":"input_boolean.heater_bad","state":"on","attributes":{"editable":false,"icon":"mdi:radiator","friendly_name":"Bad Heizung an"},"last_changed":"2022-12-31T14:00:56.842133+00:00","last_updated":"2022-12-31T14:00:56.842133+00:00","context":{"id":"01GNM7RN8A8ETFFX0ZVZY0DX2Q","parent_id":null,"user_id":"e05c526b42fb46bf96c82ed19f1f1d2c"}}
+{"entity_id":"input_boolean.heater_bad","state":"on","attributes":{"editable":false,"icon":"mdi:radiator","friendly_name":"Bad Heizung an"},"last_changed":"2022-12-31T14:00:56.842133+00:00","last_updated":"2022-12-31T14:00:56.842133+00:00","context":{"id":"01GNM7RN8A8ETFFX0ZVZY0DX2Q","parent_id":null,"user_id":"e05c526b42fb4xxxxx"}}
 ```
 
 Some Home Assistant Climate
@@ -129,4 +129,10 @@ climate:
     max_temp: 23
     ac_mode: false
 
+```
+
+Send some state to HA api
+
+```bash
+curl -X POST -H "Authorization: Bearer eyJhbGciOiWPoU" -H "Content-Type: application/json" -d '{"entity_id":"input_boolean.heater_bad","state":"on"}' http://192.168.2.165:8123/api/states/input_boolean.heater_bad
 ```
