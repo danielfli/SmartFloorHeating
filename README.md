@@ -24,16 +24,59 @@ CPU min MHz:         700.0000
 BogoMIPS:            697.95
 Flags:               half thumb fastmult vfp edsp java tls
 
+
+## Confiuration
+
+Put a connectionhomeassistant.json with thw following input to "etc/smartfloorheating/connectionhomeassistant.json"
+
+```JSON
+{
+  "api": {
+    "token": "eyJhbXXXXXXXXXXXXXXXXXXXXXLONGLIFETOKEN",
+    "ip": "192.168.x.xx",
+    "port": "8123"
+  },
+  "temperaturesensor": {
+    "entity_id": {
+      "TempBad": "sensor.tempbad_temperature",
+      "TempKind1": "sensor.tempkind1_temperature",
+      "TempKueche": "sensor.tempkueche_temperature",
+      "TempSchlafzimmer": "sensor.tempschlafzimmer_temperature",
+      "TempWohnzimmer": "sensor.tempwohnzimmer_temperature"
+    }
+  },
+  "thermostat": {
+    "entity_id": {
+      "bad": "climate.bad",
+      "ankleidezimmer": "climate.ankleidezimmer",
+      "kueche": "climate.kueche",
+      "schlafzimmer": "climate.schlafzimmer",
+      "wohnzimmer": "climate.wohnzimmer"
+    }
+  },
+  "heater": {
+    "entity_id": {
+      "bad": "input_boolean.heater_bad",
+      "ankleidezimmer": "input_boolean.heater_kind1",
+      "kueche": "input_boolean.kueche",
+      "schlafzimmer": "input_boolean.schlafzimmer",
+      "wohnzimmer": "input_boolean.wohnzimmer"
+    }
+  }
+}
+```
+
 ## Toolchain Cross building
 
-https://github.com/tttapa/docker-arm-cross-toolchain
+[Toolchain Cross building](https://github.com/tttapa/docker-arm-cross-toolchain)
 
 ## External lib needed
 
-- Boost property tree []()
-- etl []()
+- Boost property tree, option
+- curl
+- openssl
 
-### Install Lib 
+### Install Lib
 
 boost lib
 
@@ -67,3 +110,15 @@ to the target:
 scp -r /usr/local/include/etl/ $user@$ip:/usr/local/include/
 scp -r e/usr/local/share/etl/ $user@$ip:/usr/local/share/
 ```
+
+## Build SmartfFloorHeating Projekt
+
+```bash
+cd SmartFloorHeating/ && cmake -DRASPBERRY_VERSION=1 -DPATH_INSTALLDIR=build -DCMAKE_BUILD_TYPE=Debug -DIPTARGET=<YOUR__DEVICE_IP> -DUSER=<YOUR_DEVICE_USER> -DCMAKE_TOOLCHAIN_FILE=cmake/crossarmv6l.cmake -DCMAKE_INSTALL_PREFIX=build -S . -B build -G Ninja 
+```
+
+```bash
+cd build && ninja install
+```
+
+### Hardware

@@ -1,4 +1,8 @@
 
+etc/smartfloorheating/connectiontempapi*
+
+connectiontempapi.json
+
 out/
 !.vscode/settings.json
 !.vscode/extensions.json
@@ -43,3 +47,4 @@ out/
 *.out
 *.app
 .vscode/settings.json
+etc/smartfloorheating/connectionhomeassistant.json
