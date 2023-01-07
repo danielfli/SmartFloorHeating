@@ -1,3 +1,5 @@
 {
-    
+  "distributor": 5,
+  "temperaturesensor": 5,
+  "thermostat": 5
 }
