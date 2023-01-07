@@ -13,9 +13,9 @@ namespace sfh
 
 enum class States
 {
+    off,
     heating,
-    idle,
-    off
+    idle
 };
 
 struct Thermostat_Data
@@ -36,7 +36,7 @@ struct Heater_Data
 
     void SetStateTrue()
     {
-      state = true;
+        state = true;
     }
 };
 
@@ -58,8 +58,8 @@ class Thermostat
     Thermostat(HeatingConstruction heater, bool verbose);
     ~Thermostat() = default;
 
-    std::vector<DeviceThermostat> GetInputDevices();
-    std::vector<DeviceHeaterID> GetOutputDevices();
+    const std::vector<DeviceThermostat> &GetInputDevices();
+    const std::vector<DeviceHeaterID> &GetOutputDevices();
 
     Thermostat_Data GetTherostatData(std::string deviceId, bool verbose, bool dryrun = false);
     Heater_Data GetStateData(std::string heaterId, bool verbose, bool dryrun = false);

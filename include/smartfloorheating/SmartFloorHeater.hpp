@@ -3,8 +3,6 @@
 
 namespace sfh
 {
-
-//sigleton pattern
 class SmartFloorHeater
 {
   public:

@@ -21,13 +21,19 @@ class TwoLevelController
     double _hysteresis;
     int _y_output;
     int _state;
+    double _delta;
 
   public:
-    TwoLevelController(unsigned int hysteresisPercent);
+    TwoLevelController(const u_int hysteresisPercent);
     ~TwoLevelController();
 
-    void SetsetPoint_W(double SetValue, double ActualValue);
+    void SetSetpoint_W(double SetValue, double ActualValue);
 
+    /**
+     * @brief 
+     * 
+     * @return int (1): controller on; (-1) controller off  
+     */
     int GetControllerOutput_Y();
 };
 

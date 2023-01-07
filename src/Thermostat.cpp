@@ -52,7 +52,7 @@ Thermostat_Data ConvertDataToThermostat(boost::property_tree::ptree response, bo
     result.friendly_name = response.get<std::string>("attributes.friendly_name", "xxx");
     result.max_temp = response.get<double>("attributes.max_temp", 99.9);
     result.min_temp = response.get<double>("attributes.min_temp", 99.9);
-    result.setValueTemp = response.get<double>("attributes.min_temp", 99.9);
+    result.setValueTemp = response.get<double>("attributes.temperature", 99.9);
     result.str_state = response.get<std::string>("attributes.hvac_action", "");
 
     if (result.str_state == "idle")
@@ -332,12 +332,12 @@ Heater_Data Thermostat::GetStateData(std::string heaterId, bool verbose, bool dr
     return heater_state;
 }
 
-std::vector<DeviceThermostat> Thermostat::GetInputDevices()
+const std::vector<DeviceThermostat>& Thermostat::GetInputDevices()
 {
     return _vecdeviceInfo;
 }
 
-std::vector<DeviceHeaterID> Thermostat::GetOutputDevices()
+const std::vector<DeviceHeaterID>& Thermostat::GetOutputDevices()
 {
     return _vecdeviceoutput;
 }

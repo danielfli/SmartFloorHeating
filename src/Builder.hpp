@@ -14,8 +14,7 @@ class Builder
     Builder(bool verbose);
     ~Builder();
 
-    void EasySwitchOn(const int switcher);
-    void RunOpteration();
+    void RunOpteration(const u_int hysteresisPercent);
     void RunSimualtion();
     void RunMaunal();
 };

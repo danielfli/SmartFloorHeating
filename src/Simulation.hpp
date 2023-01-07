@@ -1,6 +1,7 @@
 #pragma once
 #include "../include/smartfloorheating/HeatingConstruction.hpp"
 #include "Output.hpp"
+#include "Thermostat.hpp"
 
 namespace sfh
 {
@@ -8,17 +9,15 @@ namespace sfh
 class Simulation
 {
   private:
-    Output _output;
-    const int _switcher;
-    const HeatingConstruction _heater;
+    Thermostat _thermostat;
+    const Output _output;
 
   public:
-    Simulation(const HeatingConstruction heater, const int Switcher);
+    Simulation(Thermostat &thermostat, const Output &output);
+
     ~Simulation();
 
-    void run();
-
-    void SwitchOption();
+    void RunMaunal();
 };
 
 } // namespace sfh

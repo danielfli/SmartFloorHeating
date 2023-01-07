@@ -15,10 +15,10 @@
     },
     {
       "type": "shell",
-      "label": "Copy executable to target",
+      "label": "Copy to target",
       "command": "scp ${command:cmake.launchTargetPath} root@192.168.2.145:~",
       "problemMatcher": []
-    },
+     },
     {
       "type": "shell",
       "label": "Copy and execute on target",

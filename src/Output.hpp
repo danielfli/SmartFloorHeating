@@ -14,7 +14,7 @@ class Output
     static int instance; //ToDo: sigelton create
 
   public:
-    Output(std::vector<DeviceHeaterID>& vecdeviceoutput, const size_t num, bool verbose = false);
+    Output(std::vector<DeviceHeaterID> &vecdeviceoutput, const size_t num, bool verbose = false);
     ~Output();
 
     operator bool()
@@ -22,12 +22,12 @@ class Output
         return InitSuccess;
     }
 
-    void SwitchAllOn();
+    void SwitchAllOn() const;
 
-    void SwitchAllOff();
+    void SwitchAllOff() const;
 
-    void TurnOn(const int unsigned id);
-    void TurnOff(const int unsigned id);
+    void TurnOn(const size_t pinId) const;
+    void TurnOff(const size_t pinId) const;
 
     std::vector<DeviceHeaterID> GetSwitches() const;
 };

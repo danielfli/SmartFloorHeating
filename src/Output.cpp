@@ -76,7 +76,7 @@ Output::Output(std::vector<DeviceHeaterID> &vecdeviceoutput, const size_t num, b
         _output[i].id = Pin[i];
         // set pins to an _output
         bcm2835_gpio_fsel(static_cast<uint8_t>(Pin[i]), BCM2835_GPIO_FSEL_OUTP);
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
 
     if (num != count)
@@ -91,7 +91,7 @@ Output::Output(std::vector<DeviceHeaterID> &vecdeviceoutput, const size_t num, b
 Output::~Output()
 {
     std::cout << "__SMART FLOOR HEATING__ ALL OFF " << instance << " \n ";
-    
+
     if (instance == 0)
     {
         SwitchAllOff();
@@ -100,29 +100,22 @@ Output::~Output()
     instance--;
 }
 
-/**
- * @brief Elegoo 8 Kanal DC 5V Relaismodul
- * https://amzn.eu/d/4pwvRF8
- * @param id Pin numnber
- */
 
-void Output::SwitchAllOn()
+void Output::SwitchAllOn() const
 {
 
     for (size_t i = 0; i < _output.size(); i++)
     {
         std::cout << i << " pin on\n";
-        // Turn it on
         bcm2835_gpio_write(static_cast<uint8_t>(_output[i].id), HIGH);
     }
 }
 
-void Output::SwitchAllOff()
+void Output::SwitchAllOff() const
 {
     for (size_t i = 0; i < _output.size(); i++)
     {
         std::cout << i << " pin off\n";
-        // Turn it off
         bcm2835_gpio_write(static_cast<uint8_t>(_output[i].id), LOW);
     }
 }
@@ -132,44 +125,36 @@ std::vector<DeviceHeaterID> Output::GetSwitches() const
     return _output;
 }
 
-void Output::TurnOn(const size_t id)
+void Output::TurnOn(const size_t pinId) const
 {
-    if (id == 0 || id < _output.size())
+    for (size_t i = 0; i < _output.size(); i++)
     {
-        for (size_t i = 0; i < _output.size(); i++)
+        if (pinId == _output[i].id)
         {
-            if (_output[i].id == id)
-            {
-                std::cout << "pin " << id << " - name: " << PinName[id] << " --> on\n";
-
-                bcm2835_gpio_write(static_cast<uint8_t>(id), HIGH);
-            }
+            std::cout << "switch "
+                      << "pin " << pinId << " - name: " << _output[i].entity_id << " --> on\n";
+            bcm2835_gpio_write(static_cast<uint8_t>(_output[i].id), HIGH);
+            return;
         }
     }
-    else
-    {
-        std::cout << id << " unknown -> operation not permitted \n";
-    }
+
+    std::cout << "switch " << pinId << " unknown -> operation not permitted \n";
 }
 
-void Output::TurnOff(const int unsigned id)
+void Output::TurnOff(const size_t pinId) const
 {
-    if (id == 0 || id < _output.size())
+    for (size_t i = 0; i < _output.size(); i++)
     {
-        for (size_t i = 0; i < _output.size(); i++)
+        if (pinId == _output[i].id)
         {
-            if (_output[i].id == id)
-            {
-                std::cout << "pin " << id << " - name: " << PinName[id] << " --> off\n";
-
-                bcm2835_gpio_write(static_cast<uint8_t>(id), LOW);
-            }
+            std::cout << "switch "
+                      << "pin " << pinId << " - name: " << _output[i].entity_id << " --> off\n";
+            bcm2835_gpio_write(static_cast<uint8_t>(_output[i].id), LOW);
+            return;
         }
     }
-    else
-    {
-        std::cout << id << " unknown -> operation not permitted \n";
-    }
+
+    std::cout << "switch " << pinId << " unknown -> operation not permitted \n";
 }
 
 } // namespace sfh

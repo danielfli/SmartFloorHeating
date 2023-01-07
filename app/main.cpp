@@ -12,7 +12,11 @@ int main(int argc, char **argv)
     std::cout << "_____SMART FLOOR HEATING starting...\n";
 
     SFHOption option;
-    option.Parse(argc, argv);
+    if (10 == option.Parse(argc, argv))
+    { 
+        //show help and exit
+        return 0;
+    }
 
     try
     {

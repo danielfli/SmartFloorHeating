@@ -1,7 +1,7 @@
 #include "Builder.hpp"
 #include "Input.hpp"
 #include "Operational.hpp"
-// #include "Simulation.hpp"
+#include "Simulation.hpp"
 #include "Thermostat.hpp"
 #include <boost/bind/bind.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -45,7 +45,7 @@ bool Builder::SetupHeater()
             std::cout << "Thermostat: " << _heater.thermostat << "\n";
         }
 
-        if (_heater.distributor == 0 && _heater.temperatureSensor == 0)
+        if (_heater.distributor == 0 || _heater.temperatureSensor == 0)
         {
             std::cerr << "Wrong Configuration in: " << pathConf << "\n";
             return false;
@@ -59,21 +59,21 @@ bool Builder::SetupHeater()
     return true;
 }
 
-void Builder::EasySwitchOn(const int switcher)
-{
-    if (SetupHeater())
-    {
-        // Simulation simu(_heater, switcher);
-        // simu.SwitchOption();
-        // simu.run();
-    }
-    else
-    {
-        EXIT_FAILURE;
-    }
-}
+// void Builder::EasySwitchOn(const int switcher)
+// {
+//     if (SetupHeater())
+//     {
+//         // Simulation simu(_heater, switcher);
+//         // simu.SwitchOption();
+//         // simu.run();
+//     }
+//     else
+//     {
+//         EXIT_FAILURE;
+//     }
+// }
 
-void Builder::RunOpteration()
+void Builder::RunOpteration(const u_int hysteresisPercent)
 {
     if (!SetupHeater())
     {
@@ -81,26 +81,23 @@ void Builder::RunOpteration()
     }
     else
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
         /************************Input****************************************/
         /************************Thermostat***********************************/
         Thermostat thermostats(_heater, _verbose);
-        std::vector<DeviceThermostat> devices = thermostats.GetInputDevices();
-        Thermostat_Data thermostat{};
-        Heater_Data heater_state{};
         if (_verbose)
         {
+            std::vector<DeviceThermostat> devices = thermostats.GetInputDevices();
+            Thermostat_Data thermostat{};
             for (size_t i = 0; i < devices.size(); i++)
             {
                 thermostat = thermostats.GetTherostatData(devices[i].id, _verbose);
                 std::cout << i << " Device: " << thermostat.friendly_name
                           << " Temperatur: " << thermostat.currentValueTemp << "\n";
-                // std::this_thread::sleep_for(std::chrono::seconds(1));
             }
         }
 
         /************************Output****************************************/
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        // std::this_thread::sleep_for(std::chrono::seconds(1));
         std::vector<DeviceHeaterID> outputdevices = thermostats.GetOutputDevices();
         Output output(outputdevices, _heater.distributor, _verbose);
         if (!output)
@@ -112,26 +109,61 @@ void Builder::RunOpteration()
         /************************State****************************************/
         if (_verbose)
         {
+            Heater_Data heater_state{};
             for (size_t i = 0; i < outputdevices.size(); i++)
             {
                 heater_state = thermostats.GetStateData(outputdevices[i].entity_id, _verbose);
-                std::cout << i << " heater id: " << heater_state.entity_id
-                          << " heater state: " << heater_state.state << "\n";
+                std::cout << i << " heater id: " << heater_state.entity_id << " heater state: " << heater_state.state
+                          << "\n";
                 // std::this_thread::sleep_for(std::chrono::seconds(1));
             }
         }
 
-        // auto switches = output.GetSwitches();
-
         /************************RUN*******************************************/
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        Operational op(_heater, thermostats, output);
+        Operational op(thermostats, output, hysteresisPercent);
         op.Run();
     }
 }
 
 void Builder::RunMaunal()
 {
+    if (!SetupHeater())
+    {
+        throw std::runtime_error("ERROR: Wrong configuration");
+    }
+    else
+    {
+        /************************Input****************************************/
+        /************************Thermostats**********************************/
+        Thermostat thermostat(_heater, _verbose);
+        if (_verbose)
+        {
+            std::vector<DeviceThermostat> devices = thermostat.GetInputDevices();
+            Thermostat_Data thermostats{};
+            Heater_Data heater_state{};
+            for (size_t i = 0; i < devices.size(); i++)
+            {
+                thermostats = thermostat.GetTherostatData(devices[i].id, _verbose);
+                std::cout << i << " Device: " << thermostats.friendly_name
+                          << " Temperatur: " << thermostats.currentValueTemp << "\n";
+                // std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
+
+        /************************Output****************************************/
+        // std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::vector<DeviceHeaterID> outputdevices = thermostat.GetOutputDevices();
+        Output output(outputdevices, _heater.distributor, _verbose);
+        if (!output)
+        {
+            throw std::runtime_error("ERROR: output error ");
+        }
+
+        /************************Simulation*************************************/
+        Simulation simu(thermostat, output);
+        simu.RunMaunal();
+    }
 }
 
 void Builder::RunSimualtion()

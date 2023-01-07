@@ -14,11 +14,12 @@ namespace sfh
 class SFHOption
 {
   public:
-    bool Parse(int argc, char **argv);
+    int Parse(int argc, char **argv);
 
     int switchOn = 99;
     bool verbose;
     int runstate;
+    u_int percent;
 };
 
 } // namespace sfh
