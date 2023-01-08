@@ -1,0 +1,13 @@
+[Unit]
+Description=Smart Floor Heater Control
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/local/bin/floorheating
+RestartSec=10
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

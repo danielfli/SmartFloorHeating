@@ -43,7 +43,6 @@ bool Operational::Run()
     std::vector<sfh::DeviceThermostat> thermostats = _thermostat.GetInputDevices();
     auto distributor = _thermostat.GetOutputDevices();
 
-    //ToDo: Ablauf
     //! 1. Input 0 - x einlesen
     //! 2. Verarbeiten 0 - x verarbeiten
     //! 3. Output  (3.1: State , 3.2: schalten )  0 - x ausgeben
@@ -56,11 +55,10 @@ bool Operational::Run()
     {
         std::cout << "\n\ncylce round: " << ++round_counter << "\n";
         std::cout << "\n\n";
-        std::cout << "-----------------------------------";
+        std::cout << "-----------------------------------\n";
+
         for (size_t i = 0; i < distributor.size(); i++)
         {
-            /* code */
-
             //!input
             distributorStatePre = _thermostat.GetStateData(distributor[i].entity_id, false);
             thermostatData = _thermostat.GetTherostatData(thermostats[i].id, false);
@@ -72,6 +70,8 @@ bool Operational::Run()
                 std::cout << "Room: " << thermostatData.friendly_name
                           << " - Current Temp: " << thermostatData.currentValueTemp << " °C HEATING OFF"
                           << "\n";
+                _output.TurnOff(switches[i].id);
+                distributorStatePost = _thermostat.SetHeaterState({false, distributor[i].entity_id}, false);
                 break;
 
             case States::idle:
@@ -79,6 +79,19 @@ bool Operational::Run()
                           << " - Current Temp: " << thermostatData.currentValueTemp << " °C HEATING IDLE"
                           << "\n";
                 _veccontrol[i].SetSetpoint_W(thermostatData.setValueTemp, thermostatData.currentValueTemp);
+
+                //!output
+                controllerOutput_X = _veccontrol[i].GetControllerOutput_Y();
+                if (controllerOutput_X == 1)
+                {
+                    _output.TurnOn(switches[i].id);
+                    distributorStatePost = _thermostat.SetHeaterState({true, distributor[i].entity_id}, false);
+                }
+                else if (controllerOutput_X == -1)
+                {
+                    _output.TurnOff(switches[i].id);
+                    distributorStatePost = _thermostat.SetHeaterState({false, distributor[i].entity_id}, false);
+                }
                 break;
 
             case States::heating:
@@ -86,30 +99,31 @@ bool Operational::Run()
                           << " - Current Temp: " << thermostatData.currentValueTemp << " °C HEATING ON"
                           << "\n";
                 _veccontrol[i].SetSetpoint_W(thermostatData.setValueTemp, thermostatData.currentValueTemp);
+
+                //!output
+                controllerOutput_X = _veccontrol[i].GetControllerOutput_Y();
+                if (controllerOutput_X == 1)
+                {
+                    _output.TurnOn(switches[i].id);
+                    distributorStatePost = _thermostat.SetHeaterState({true, distributor[i].entity_id}, false);
+                }
+                else if (controllerOutput_X == -1)
+                {
+                    _output.TurnOff(switches[i].id);
+                    distributorStatePost = _thermostat.SetHeaterState({false, distributor[i].entity_id}, false);
+                }
                 break;
 
             default:
                 break;
             }
 
-            //!output
-            controllerOutput_X = _veccontrol[i].GetControllerOutput_Y();
-            if (controllerOutput_X == 1)
-            {
-                _output.TurnOn(switches[i].id);
-                distributorStatePost = _thermostat.SetHeaterState({true, distributor[i].entity_id}, false);
-            }
-            else if (controllerOutput_X == -1)
-            {
-                _output.TurnOff(switches[i].id);
-                distributorStatePost = _thermostat.SetHeaterState({false, distributor[i].entity_id}, false);
-            }
             //!Log
             std::cout << std::boolalpha << "Distributor States - pre: " << distributorStatePre.state
-                      << " - post: " << distributorStatePost.state << "\n";
+                      << " - post: " << distributorStatePost.state << "\n\n";
         }
 
-        std::this_thread::sleep_for(std::chrono::seconds(10));
+        std::this_thread::sleep_for(std::chrono::minutes(1));
     }
 
     return true;
